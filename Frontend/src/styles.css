@@ -1,0 +1,65 @@
+/* --- Global Font Import --- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+
+html {
+  /* Light Theme (Default) */
+  --bg-color: #f8fafc;
+  --bg-alt-color: #ffffff;
+  --text-color: #1f2937;
+  --text-muted-color: #6b7280;
+  --primary-color: #4f46e5;
+  --primary-hover-color: #4338ca;
+  --logo-accent-color: #1406ff;
+  --border-color: #e5e7eb;
+  --card-bg-color: #ffffff;
+  --shadow-color-rgba: rgba(0, 0, 0, 0.05);
+  --input-focus-shadow-rgba: rgba(79, 70, 229, 0.2);
+
+  /* Smooth transition for theme changes */
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* --- FIX: Yeh wala part hata diya gaya hai --- */
+/* body.dark-mode { ... } was here. It has been removed.
+*/
+
+html.dark-mode {
+  /* Dark Theme Overrides */
+  --bg-color: #111827;
+  --bg-alt-color: #1f2937;
+  --text-color: #f3f4f6;
+  --text-muted-color: #9ca3af;
+  --primary-color: #6366f1;
+  --primary-hover-color: #818cf8;
+  --logo-accent-color: #818cf8;
+  --border-color: #374151;
+  --card-bg-color: #1f2937;
+  --shadow-color-rgba: rgba(0, 0, 0, 0.2);
+  --input-focus-shadow-rgba: rgba(99, 102, 241, 0.3);
+}
+
+/* --- Base Body & Element Styles --- */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--bg-color); /* Yeh line automatically update ho jayegi! */
+  color: var(--text-color);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* --- Container for consistent spacing --- */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+

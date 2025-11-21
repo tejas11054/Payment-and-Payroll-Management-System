@@ -1,0 +1,80 @@
+<!-- Consistent Header -->
+<header class="navbar">
+  <div class="nav-container">
+    <a routerLink="/" class="logo">Pay<span class="logo-accent">Roll</span></a>
+    
+    <nav class="nav-links">
+      <a routerLink="/about" routerLinkActive="active-link" class="nav-link">About Us</a>
+      <a routerLink="/contact" routerLinkActive="active-link" class="nav-link">Contact Us</a>
+      <a routerLink="/login" class="nav-link" style="flex-shrink: 0;">Login</a>
+      <a routerLink="/register" class="nav-link nav-link-register">Register as Org</a>
+      
+      <!-- Theme Toggle Button -->
+      <button (click)="toggleTheme()" class="theme-toggle" aria-label="Toggle theme">
+        <svg *ngIf="!isDarkMode" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" /></svg>
+        <svg *ngIf="isDarkMode" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.95-4.243l-1.59-1.591M3.75 12H6m4.243-4.95l1.59-1.591M12 6.75A5.25 5.25 0 006.75 12a5.25 5.25 0 005.25 5.25a5.25 5.25 0 005.25-5.25A5.25 5.25 0 0012 6.75z" /></svg>
+      </button>
+    </nav>
+    
+    <!-- Mobile Menu Button (Add logic in your TS file if needed) -->
+    <button class="mobile-menu-button">
+      <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+    </button>
+  </div>
+</header>
+
+<!-- Main Content for Contact Us Page -->
+<main class="contact-us-wrapper">
+  <div class="container content-section">
+    <h1>Get in Touch</h1>
+    <p class="subtitle">
+      Have a question or need support? We're here to help.
+    </p>
+
+    <div class="contact-grid">
+      <!-- Contact Info Section -->
+      <div class="contact-info">
+        <h3>Contact Information</h3>
+        <p>Fill out the form and our team will get back to you within 24 hours.</p>
+        
+        <div class="info-item">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" /></svg>
+          <span>+91 98765 43210</span>
+        </div>
+        <div class="info-item">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
+          <span>support@payroll.com</span>
+        </div>
+        <div class="info-item">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
+          <span>Navi Mumbai, Maharashtra, India</span>
+        </div>
+      </div>
+
+      <!-- Contact Form Section -->
+      <div class="contact-form-container">
+          <!-- Add your form tag here if you are using one -->
+          <div class="form-group">
+            <label for="name">Full Name</label>
+            <input id="name" type="text" placeholder="John Doe">
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input id="email" type="email" placeholder="john.doe@example.com">
+          </div>
+          <div class="form-group">
+            <label for="subject">Subject</label>
+            <input id="subject" type="text" placeholder="How can we help?">
+          </div>
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" rows="5" placeholder="Your message..."></textarea>
+          </div>
+          <button type="submit" class="btn-submit">
+            Send Message
+          </button>
+      </div>
+    </div>
+  </div>
+</main>
+

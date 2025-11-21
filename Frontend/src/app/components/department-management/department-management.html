@@ -1,0 +1,23 @@
+<div class="department-container">
+  <h2>Departments</h2>
+  
+  <form [formGroup]="deptForm" (ngSubmit)="onAddDept()">
+    <input type="text" formControlName="deptName" placeholder="Department Name">
+    <button type="submit" [disabled]="deptForm.invalid">Add Department</button>
+  </form>
+
+  <table>
+    <thead>
+      <tr><th>Name</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let dept of departments">
+        <td>{{ dept.deptName }}</td>
+        <td>
+          <button (click)="editDept(dept)">Edit</button>
+          <button (click)="deleteDept(dept.deptId)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

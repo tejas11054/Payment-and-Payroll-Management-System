@@ -1,0 +1,223 @@
+<!-- add-vendor-modal.component.html -->
+
+<div class="modal-overlay" *ngIf="isOpen" (click)="closeModal()">
+  <div class="modal-content modal-vendor" (click)="$event.stopPropagation()">
+    
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="modal-header-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+        </svg>
+      </div>
+      <h3 class="modal-title">Add New Vendor</h3>
+      <p class="modal-subtitle">Register a new vendor for your organization</p>
+    </div>
+
+    <!-- Vendor Form -->
+    <form [formGroup]="vendorForm" (ngSubmit)="onSubmit()" class="vendor-form">
+      
+      <!-- Basic Information Section -->
+      <div class="form-section">
+        <h4 class="section-title">Basic Information</h4>
+        
+        <div class="form-grid">
+          <!-- Vendor Name -->
+          <div class="form-group">
+            <label for="name" class="form-label">
+              Vendor Name *
+            </label>
+            <input 
+              type="text" 
+              id="name" 
+              formControlName="name"
+              placeholder="Enter vendor name"
+              class="form-input"
+              [class.input-error]="isFieldInvalid('name')"
+            />
+            <span class="error-text" *ngIf="isFieldInvalid('name')">
+              {{ getErrorMessage('name') }}
+            </span>
+          </div>
+
+          <!-- Vendor Type -->
+          <div class="form-group">
+            <label for="vendorType" class="form-label">
+              Vendor Type *
+            </label>
+            <select 
+              id="vendorType" 
+              formControlName="vendorType"
+              class="form-input form-select"
+              [class.input-error]="isFieldInvalid('vendorType')"
+            >
+              <option value="" disabled>Select vendor type</option>
+              <option *ngFor="let type of vendorTypes" [value]="type">
+                {{ type }}
+              </option>
+            </select>
+            <span class="error-text" *ngIf="isFieldInvalid('vendorType')">
+              {{ getErrorMessage('vendorType') }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Information Section -->
+      <div class="form-section">
+        <h4 class="section-title">Contact Information</h4>
+        
+        <div class="form-grid">
+          <!-- Email -->
+          <div class="form-group">
+            <label for="contactEmail" class="form-label">
+              Email Address *
+            </label>
+            <input 
+              type="email" 
+              id="contactEmail" 
+              formControlName="contactEmail"
+              placeholder="vendor@example.com"
+              class="form-input"
+              [class.input-error]="isFieldInvalid('contactEmail')"
+            />
+            <span class="error-text" *ngIf="isFieldInvalid('contactEmail')">
+              {{ getErrorMessage('contactEmail') }}
+            </span>
+          </div>
+
+          <!-- Phone -->
+          <div class="form-group">
+            <label for="phone" class="form-label">
+              Phone Number *
+            </label>
+            <input 
+              type="tel" 
+              id="phone" 
+              formControlName="phone"
+              placeholder="10-digit mobile number"
+              class="form-input"
+              maxlength="10"
+              [class.input-error]="isFieldInvalid('phone')"
+            />
+            <span class="error-text" *ngIf="isFieldInvalid('phone')">
+              {{ getErrorMessage('phone') }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bank Details Section -->
+      <div class="form-section">
+        <h4 class="section-title">Bank Details</h4>
+        
+        <div class="form-grid">
+          <!-- Bank Name -->
+          <div class="form-group">
+            <label for="bankName" class="form-label">
+              Bank Name *
+            </label>
+            <input 
+              type="text" 
+              id="bankName" 
+              formControlName="bankName"
+              placeholder="Enter bank name"
+              class="form-input"
+              [class.input-error]="isFieldInvalid('bankName')"
+            />
+            <span class="error-text" *ngIf="isFieldInvalid('bankName')">
+              {{ getErrorMessage('bankName') }}
+            </span>
+          </div>
+
+          <!-- IFSC Code -->
+          <div class="form-group">
+            <label for="ifscCode" class="form-label">
+              IFSC Code *
+            </label>
+            <input 
+              type="text" 
+              id="ifscCode" 
+              formControlName="ifscCode"
+              placeholder="e.g., SBIN0001234"
+              class="form-input"
+              maxlength="11"
+              style="text-transform: uppercase;"
+              [class.input-error]="isFieldInvalid('ifscCode')"
+            />
+            <span class="error-text" *ngIf="isFieldInvalid('ifscCode')">
+              {{ getErrorMessage('ifscCode') }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Bank Account Number (Full Width) -->
+        <div class="form-group">
+          <label for="bankAccountNo" class="form-label">
+            Bank Account Number *
+          </label>
+          <input 
+            type="text" 
+            id="bankAccountNo" 
+            formControlName="bankAccountNo"
+            placeholder="Enter 9-18 digit account number"
+            class="form-input"
+            maxlength="18"
+            [class.input-error]="isFieldInvalid('bankAccountNo')"
+          />
+          <span class="error-text" *ngIf="isFieldInvalid('bankAccountNo')">
+            {{ getErrorMessage('bankAccountNo') }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Document Upload Section -->
+      <div class="form-section">
+        <h4 class="section-title">Supporting Document (Optional)</h4>
+        
+        <div class="file-upload-area">
+          <input 
+            type="file" 
+            id="documentFile" 
+            (change)="onFileSelected($event)"
+            accept=".pdf,.jpg,.jpeg,.png"
+            class="file-input"
+          />
+          <label for="documentFile" class="file-upload-label">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            <span class="upload-text">
+              {{ selectedFile ? selectedFile.name : 'Click to upload or drag and drop' }}
+            </span>
+            <span class="upload-hint">PDF, JPG, PNG (Max 5MB)</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button 
+          type="button" 
+          class="btn btn-secondary" 
+          (click)="closeModal()"
+          [disabled]="isLoading"
+        >
+          Cancel
+        </button>
+        <button 
+          type="submit" 
+          class="btn btn-primary" 
+          [disabled]="isLoading || vendorForm.invalid"
+        >
+          <span class="btn-spinner" *ngIf="isLoading"></span>
+          <svg *ngIf="!isLoading" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span *ngIf="!isLoading">Add Vendor</span>
+          <span *ngIf="isLoading">Creating...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

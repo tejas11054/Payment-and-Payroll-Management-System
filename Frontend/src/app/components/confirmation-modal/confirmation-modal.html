@@ -1,0 +1,25 @@
+    <div class="modal-overlay" *ngIf="confirmService.isVisible()" (click)="confirmService.onCancel()">
+      <div class="modal-container" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>{{ confirmService.config().title }}</h3>
+          <button class="modal-close" (click)="confirmService.onCancel()">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <p>{{ confirmService.config().message }}</p>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="confirmService.onCancel()">
+            {{ confirmService.config().cancelText }}
+          </button>
+          <button class="btn btn-primary" (click)="confirmService.onConfirm()">
+            {{ confirmService.config().confirmText }}
+          </button>
+        </div>
+      </div>
+    </div>

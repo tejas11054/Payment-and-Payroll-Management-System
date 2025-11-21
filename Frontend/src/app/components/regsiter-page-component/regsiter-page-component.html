@@ -1,0 +1,307 @@
+<!-- Main Registration Wrapper -->
+
+<div class="loading-overlay" *ngIf="isLoading">
+  <div class="spinner"></div>
+  <p class="loading-text">Registering your organization...<br>Please wait, this may take a moment.</p>
+</div>
+
+<div class="register-wrapper">
+  <!-- Header with Logo and Login Link -->
+  <header class="register-header">
+    <a routerLink="/" class="logo">Pay<span class="logo-accent">Roll</span></a>
+    <p>Already have an account? <a routerLink="/login" class="login-link">Sign In</a></p>
+  </header>
+
+  <!-- Form Container -->
+  <div class="form-container">
+    <h2>Register Your Organization</h2>
+    <p class="subtitle">Complete the steps below to get started.</p>
+
+    <!-- Step Progress Bar -->
+    <div class="progress-bar">
+      <div class="step" [class.active]="currentStep >= 1">
+        <div class="step-icon">1</div>
+        <div class="step-label">Organization</div>
+      </div>
+      <div class="step-connector" [class.active]="currentStep > 1"></div>
+      <div class="step" [class.active]="currentStep >= 2">
+        <div class="step-icon">2</div>
+        <div class="step-label">Bank Details</div>
+      </div>
+      <div class="step-connector" [class.active]="currentStep > 2"></div>
+      <div class="step" [class.active]="currentStep >= 3">
+        <div class="step-icon">3</div>
+        <div class="step-label">Documents</div>
+      </div>
+    </div>
+
+    <!-- Registration Form -->
+    <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" novalidate>
+
+      <!-- ============== STEP 1: ORGANIZATION DETAILS ============== -->
+      <div class="form-step" *ngIf="currentStep === 1">
+        <div class="form-grid">
+          
+          <!-- Organization Name -->
+          <div class="form-group">
+            <label for="orgName">Organization Name <span class="required">*</span></label>
+            <input 
+              id="orgName" 
+              type="text" 
+              formControlName="orgName" 
+              placeholder="e.g., Acme Corporation"
+              [class.input-error]="getFieldError('orgName') || (f['orgName'].invalid && f['orgName'].touched)"
+              (input)="clearFieldError('orgName')"
+            >
+            
+            <!-- ✅ Frontend validation error -->
+            <div 
+              *ngIf="f['orgName'].invalid && f['orgName'].touched && !getFieldError('orgName')" 
+              class="error-text"
+            >
+              <span *ngIf="f['orgName'].hasError('required')">Organization name is required</span>
+              <span *ngIf="f['orgName'].hasError('minlength')">Minimum 3 characters required</span>
+            </div>
+            
+            <!-- ✅ Backend error -->
+            <div *ngIf="getFieldError('orgName')" class="error-text backend-error">
+              <span class="error-icon">⚠️</span>
+              <span>{{ getFieldError('orgName') }}</span>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label for="email">Official Email <span class="required">*</span></label>
+            <input 
+              id="email" 
+              type="email" 
+              formControlName="email" 
+              placeholder="you@company.com"
+              [class.input-error]="getFieldError('email') || (f['email'].invalid && f['email'].touched)"
+              (input)="clearFieldError('email')"
+            >
+            
+            <!-- ✅ Frontend validation error -->
+            <div 
+              *ngIf="f['email'].invalid && f['email'].touched && !getFieldError('email')" 
+              class="error-text"
+            >
+              <span *ngIf="f['email'].hasError('required')">Email is required</span>
+              <span *ngIf="f['email'].hasError('email')">Invalid email format</span>
+            </div>
+            
+            <!-- ✅ Backend error -->
+            <div *ngIf="getFieldError('email')" class="error-text backend-error">
+              <span class="error-icon">⚠️</span>
+              <span>{{ getFieldError('email') }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phone -->
+        <div class="form-group">
+          <label for="phone">Phone Number <span class="required">*</span></label>
+          <input 
+            id="phone" 
+            type="tel" 
+            formControlName="phone" 
+            placeholder="10-digit mobile number"
+            [class.input-error]="getFieldError('phone') || (f['phone'].invalid && f['phone'].touched)"
+            (input)="clearFieldError('phone')"
+          >
+          
+          <!-- ✅ Frontend validation error -->
+          <div 
+            *ngIf="f['phone'].invalid && f['phone'].touched && !getFieldError('phone')" 
+            class="error-text"
+          >
+            <span *ngIf="f['phone'].hasError('required')">Phone number is required</span>
+            <span *ngIf="f['phone'].hasError('pattern')">Valid 10-digit number is required</span>
+          </div>
+          
+          <!-- ✅ Backend error -->
+          <div *ngIf="getFieldError('phone')" class="error-text backend-error">
+            <span class="error-icon">⚠️</span>
+            <span>{{ getFieldError('phone') }}</span>
+          </div>
+        </div>
+        
+        <!-- Address -->
+        <div class="form-group">
+          <label for="address">Full Address <span class="required">*</span></label>
+          <textarea 
+            id="address" 
+            formControlName="address" 
+            rows="3" 
+            placeholder="Your company's full address"
+            [class.input-error]="f['address'].invalid && f['address'].touched"
+          ></textarea>
+          
+          <div *ngIf="f['address'].invalid && f['address'].touched" class="error-text">
+            <span *ngIf="f['address'].hasError('required')">Address is required</span>
+          </div>
+        </div>
+
+        <!-- Employee Count -->
+        <div class="form-group">
+          <label for="employeeCount">Number of Employees <span class="required">*</span></label>
+          <input 
+            id="employeeCount" 
+            type="number" 
+            formControlName="employeeCount" 
+            placeholder="e.g., 50"
+            [class.input-error]="f['employeeCount'].invalid && f['employeeCount'].touched"
+          >
+          
+          <div *ngIf="f['employeeCount'].invalid && f['employeeCount'].touched" class="error-text">
+            <span *ngIf="f['employeeCount'].hasError('required')">Employee count is required</span>
+            <span *ngIf="f['employeeCount'].hasError('min')">Must be at least 1</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============== STEP 2: BANK DETAILS ============== -->
+      <div class="form-step" *ngIf="currentStep === 2">
+        
+        <!-- Bank Account Number -->
+        <div class="form-group">
+          <label for="bankAccountNo">Bank Account Number <span class="required">*</span></label>
+          <input 
+            id="bankAccountNo" 
+            type="text" 
+            formControlName="bankAccountNo" 
+            placeholder="Enter account number (9-18 digits)"
+            [class.input-error]="getFieldError('bankAccountNo') || (f['bankAccountNo'].invalid && f['bankAccountNo'].touched)"
+            (input)="clearFieldError('bankAccountNo')"
+          >
+          
+          <!-- ✅ Frontend validation error -->
+          <div 
+            *ngIf="f['bankAccountNo'].invalid && f['bankAccountNo'].touched && !getFieldError('bankAccountNo')" 
+            class="error-text"
+          >
+            <span *ngIf="f['bankAccountNo'].hasError('required')">Bank account number is required</span>
+            <span *ngIf="f['bankAccountNo'].hasError('pattern')">Invalid account number (9-18 digits)</span>
+          </div>
+          
+          <!-- ✅ Backend error -->
+          <div *ngIf="getFieldError('bankAccountNo')" class="error-text backend-error">
+            <span class="error-icon">⚠️</span>
+            <span>{{ getFieldError('bankAccountNo') }}</span>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <!-- IFSC Code -->
+          <div class="form-group">
+            <label for="ifscCode">IFSC Code <span class="required">*</span></label>
+            <input 
+              id="ifscCode" 
+              type="text" 
+              formControlName="ifscCode" 
+              placeholder="e.g., SBIN0001234"
+              [class.input-error]="f['ifscCode'].invalid && f['ifscCode'].touched"
+            >
+            
+            <div *ngIf="f['ifscCode'].invalid && f['ifscCode'].touched" class="error-text">
+              <span *ngIf="f['ifscCode'].hasError('required')">IFSC code is required</span>
+              <span *ngIf="f['ifscCode'].hasError('pattern')">Invalid IFSC code format</span>
+            </div>
+          </div>
+          
+          <!-- Bank Name -->
+          <div class="form-group">
+            <label for="bankName">Bank Name <span class="required">*</span></label>
+            <input 
+              id="bankName" 
+              type="text" 
+              formControlName="bankName" 
+              placeholder="e.g., State Bank of India"
+              [class.input-error]="f['bankName'].invalid && f['bankName'].touched"
+            >
+            
+            <div *ngIf="f['bankName'].invalid && f['bankName'].touched" class="error-text">
+              <span *ngIf="f['bankName'].hasError('required')">Bank name is required</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============== STEP 3: DOCUMENT UPLOAD ============== -->
+      <div class="form-step" *ngIf="currentStep === 3">
+        <div class="form-group file-upload-group">
+          <label for="verificationDocs">Verification Documents <span class="required">*</span></label>
+          <p class="file-instructions">Upload documents like PAN, GST Certificate, etc. You can select multiple files.</p>
+          
+          <!-- Custom file upload area -->
+          <div class="file-upload-area">
+            <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline points="17 8 12 3 7 8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="12" y1="3" x2="12" y2="15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <p class="upload-text">Click to upload or drag and drop</p>
+            <p class="upload-hint">PDF, JPG, PNG (Max 5MB each)</p>
+            <input 
+              id="verificationDocs" 
+              type="file" 
+              multiple 
+              (change)="onFileChange($event)" 
+              class="file-input"
+              accept=".pdf,.jpg,.jpeg,.png"
+            >
+          </div>
+        </div>
+        
+        <!-- Display selected file names with icons -->
+        <div class="file-list" *ngIf="uploadedFiles.length > 0">
+          <p class="file-list-header">
+            <strong>Selected Files ({{ uploadedFiles.length }})</strong>
+          </p>
+          <ul>
+            <li *ngFor="let file of uploadedFiles; let i = index" class="file-item">
+              <span class="file-icon">📄</span>
+              <span class="file-name">{{ file.name }}</span>
+              <span class="file-size">({{ (file.size / 1024).toFixed(2) }} KB)</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- ============== NAVIGATION BUTTONS ============== -->
+      <div class="navigation-buttons">
+        <button 
+          type="button" 
+          class="btn btn-secondary" 
+          (click)="prevStep()" 
+          *ngIf="currentStep > 1"
+        >
+          ← Previous
+        </button>
+        
+        <button 
+          type="button" 
+          class="btn btn-primary" 
+          (click)="nextStep()" 
+          *ngIf="currentStep < 3"
+        >
+          Next Step →
+        </button>
+        
+        <button 
+          type="submit" 
+          class="btn btn-submit" 
+          *ngIf="currentStep === 3"
+          [disabled]="registrationForm.invalid || isLoading || uploadedFiles.length === 0"
+        >
+          <span *ngIf="!isLoading">✓ Register Organization</span>
+          <span *ngIf="isLoading">
+            <span class="btn-spinner"></span> Registering...
+          </span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

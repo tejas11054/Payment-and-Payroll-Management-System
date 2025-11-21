@@ -1,0 +1,63 @@
+<!-- ======================== GLOBAL SMART NAVBAR ======================== -->
+<header class="navbar" *ngIf="!router.url.includes('/dashboard')">
+  <div class="nav-container">
+    <!-- Logo -->
+    <a (click)="authService.isLoggedIn() ? navigateToDashboard() : null" [routerLink]="authService.isLoggedIn() ? null : '/'" class="logo">
+        Pay<span class="logo-accent">Roll</span>
+    </a>
+
+    <!-- Navigation Links -->
+    <nav class="nav-links">
+        <!-- Links for Logged Out Users -->
+        <ng-container *ngIf="!authService.isLoggedIn()">
+            <a routerLink="/about" class="nav-link">About Us</a>
+            <a routerLink="/contact" class="nav-link">Contact Us</a>
+            <a routerLink="/login" class="nav-link">Login</a>
+            <a routerLink="/register" class="nav-link nav-link-register">Register as Org</a>
+        </ng-container>
+
+        <!-- Links for Logged In Users -->
+        <ng-container *ngIf="authService.isLoggedIn()">
+            <a (click)="navigateToDashboard()" class="nav-link">Dashboard</a>
+            <a (click)="logout()" class="nav-link nav-link-register">Logout</a>
+        </ng-container>
+
+        <!-- Theme Toggle Button -->
+        <button (click)="dark.toggle()" class="theme-toggle">
+            <!-- Icons would go here -->
+                     <svg *ngIf="!isDarkMode" xmlns="http://www.w3.org/2000/svg" fill="none"
+             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75
+                   0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21
+                   12.75 21a9.753 9.753 0 009.002-5.998z" />
+        </svg>
+        <!-- Sun icon when dark -->
+        <svg *ngIf="isDarkMode" xmlns="http://www.w3.org/2000/svg" fill="none" 
+             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386
+                   6.364l-1.591-1.591M12 18.75V21m-4.95-4.243l-1.59-1.591M3.75
+                   12H6m4.243-4.95l1.59-1.591M12 6.75A5.25 5.25 0 006.75
+                   12a5.25 5.25 0 005.25 5.25a5.25 5.25 0 005.25-5.25A5.25
+                   5.25 0 0012 6.75z" />
+        </svg>
+        </button>
+    </nav>
+  </div>
+</header>
+
+<!-- This is where all your pages will be rendered -->
+<!-- <main class="main-router-outlet">
+  <router-outlet></router-outlet>
+</main> -->
+
+<!-- Global Toast Notification Component -->
+<app-toast></app-toast>
+<app-confirmation-modal></app-confirmation-modal>
+<main [class.no-padding-top]="router.url.includes('/dashboard')">
+  <router-outlet></router-outlet>
+</main>
+
+
+

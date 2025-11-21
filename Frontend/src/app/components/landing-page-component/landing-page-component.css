@@ -1,0 +1,228 @@
+/* --- 1. Define Color Variables for Light & Dark Themes --- */
+:host {
+    /* Light Theme (Default) */
+    --bg-color: #f8fafc;
+    --bg-alt-color: #ffffff;
+    --text-color: #1f2937;
+    --text-muted-color: #6b7280;
+    --primary-color: #4f46e5;
+    --primary-hover-color: #4338ca;
+    --accent-color: #6d28d9;
+    --navbar-bg: rgba(235, 238, 241, 0.8);
+    --hero-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --card-bg: #f9fafb;
+
+    display: block;
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+:host(.dark-mode) {
+    /* Dark Theme Overrides */
+    --bg-color: #111827;
+    --bg-alt-color: #1f2937;
+    --text-color: #f3f4f6;
+    --text-muted-color: #9ca3af;
+    --primary-color: #6366f1;
+    --primary-hover-color: #818cf8;
+    --accent-color: #a78bfa;
+    --navbar-bg: rgba(17, 24, 39, 0.8);
+    --hero-gradient: linear-gradient(135deg, #3730a3 0%, #1e1b4b 100%);
+    --card-bg: #1f2937;
+}
+
+/* --- 2. Update existing CSS to use Variables --- */
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+/* --- Header & Navigation --- */
+.navbar {
+    background-color: var(--navbar-bg);
+    backdrop-filter: blur(10px);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 80px;
+}
+
+.logo {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.logo-accent {
+    color: var(--primary-color);
+}
+
+.nav-links {
+    display: none; /* Hidden on mobile */
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.nav-link {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-muted-color);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    transition: all 0.3s ease-in-out;
+}
+
+.nav-link:hover {
+    color: var(--primary-color);
+}
+
+.nav-link-register {
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.nav-link-register:hover {
+    background-color: var(--primary-hover-color);
+    color: white;
+}
+
+/* --- Theme Toggle Button --- */
+.theme-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted-color);
+    padding: 0.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.theme-toggle:hover {
+    background-color: rgba(128, 128, 128, 0.1);
+    color: var(--primary-color);
+}
+
+.theme-toggle svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* (Rest of your CSS from mobile-menu-button to footer, no changes needed there) */
+.mobile-menu-button { display: block; background: none; border: none; cursor: pointer; }
+.mobile-menu-button .icon { width: 24px; height: 24px; color: var(--text-muted-color); }
+
+/* --- Hero Section --- */
+.hero {
+    padding-top: 160px;
+    padding-bottom: 80px;
+    text-align: center;
+    color: white;
+    background: var(--hero-gradient);
+}
+.hero h1 { font-size: 2.5rem; font-weight: 700; line-height: 1.2; margin-bottom: 1rem; }
+.hero p { font-size: 1.125rem; color: #e0e7ff; max-width: 48rem; margin: 0 auto 2rem auto; }
+.cta-button {
+    display: inline-block;
+    background-color: white;
+    color: var(--primary-color);
+    font-size: 1.125rem;
+    font-weight: 700;
+    padding: 0.75rem 2rem;
+    border-radius: 9999px;
+    text-decoration: none;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+}
+.cta-button:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15); }
+
+/* --- Features Section --- */
+.features-section {
+    padding-top: 80px;
+    padding-bottom: 80px;
+    background-color: var(--bg-alt-color);
+    transition: background-color 0.3s ease;
+}
+.section-header { text-align: center; margin-bottom: 3rem; }
+.section-header h2 { font-size: 2.25rem; font-weight: 700; }
+.section-header p { color: var(--text-muted-color); margin-top: 0.5rem; }
+.features-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+.feature-card {
+    background-color: var(--card-bg);
+    padding: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 2px solid transparent;
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+}
+.feature-card:hover { transform: translateY(-5px); border-color: var(--accent-color); }
+.feature-icon svg { width: 48px; height: 48px; margin: 0 auto 1rem auto; color: var(--primary-color); }
+.feature-card h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
+.feature-card p { color: var(--text-muted-color); }
+
+/* --- Footer --- */
+.footer {
+    background-color: var(--bg-alt-color);
+    border-top: 1px solid var(--card-bg); /* Subtle border */
+    color: var(--text-muted-color);
+    padding: 2rem 0;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+:host(.dark-mode) .footer {
+    background-color: #111827;
+    border-top: 1px solid #1f2937;
+}
+
+/* --- Responsive Design --- */
+@media (min-width: 768px) {
+    .nav-links { display: flex; }
+    .mobile-menu-button { display: none; }
+    .hero h1 { font-size: 3.75rem; }
+    .features-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* (Your mobile menu toggle CSS can remain as is) */
+@media (max-width: 768px) {
+    .menu-toggle { display: block; z-index: 100; }
+    .navbar nav {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+        background-color: var(--bg-alt-color);
+        position: absolute;
+        top: 68px;
+        left: 0;
+        width: 100%;
+        padding: 2rem 0;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transform: translateY(-150%);
+        transition: transform 0.3s ease-in-out, background-color 0.3s ease;
+    }
+    .navbar nav.active { transform: translateY(0); }
+    .hero h1 { font-size: 2.5rem; }
+    .features-grid { grid-template-columns: 1fr; }
+}

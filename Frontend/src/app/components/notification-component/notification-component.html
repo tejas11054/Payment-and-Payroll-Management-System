@@ -1,0 +1,145 @@
+<!-- Notification Bell Container -->
+<div class="notification-container">
+  <!-- Notification Bell Button -->
+  <button 
+    class="notification-bell" 
+    (click)="toggleDropdown()"
+    [class.has-notifications]="unreadCount > 0">
+    
+    <svg 
+      class="bell-icon" 
+      [class.shake]="unreadCount > 0"
+      fill="none" 
+      stroke="currentColor" 
+      viewBox="0 0 24 24">
+      <path 
+        stroke-linecap="round" 
+        stroke-linejoin="round" 
+        stroke-width="2" 
+        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+    </svg>
+    
+    <span class="notification-badge" *ngIf="unreadCount > 0">
+      {{ unreadCount > 99 ? '99+' : unreadCount }}
+    </span>
+  </button>
+
+  <!-- Notification Dropdown -->
+  <div class="notification-dropdown" *ngIf="isDropdownOpen">
+    <!-- Header -->
+    <div class="dropdown-header">
+      <div class="header-content">
+        <h3>Notifications</h3>
+        <span class="notification-count">{{ unreadCount }} unread</span>
+      </div>
+      
+      <button 
+        class="mark-all-read-btn" 
+        (click)="markAllAsRead()"
+        *ngIf="unreadCount > 0">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+      </button>
+    </div>
+<!-- Notification Detail Modal -->
+<div class="notification-modal" *ngIf="selectedNotification" (click)="closeNotificationDetail()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ selectedNotification.subject }}</h3>
+      <button class="close-btn" (click)="closeNotificationDetail()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="modal-meta">
+        <span class="badge" [class]="getPriorityClass(selectedNotification.priority)">
+          {{ selectedNotification.priority }}
+        </span>
+        <span class="time">{{ getTimeAgo(selectedNotification.sentAt) }}</span>
+      </div>
+      
+      <p class="full-message">{{ selectedNotification.bodySummary }}</p>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="modal-btn" (click)="closeNotificationDetail()">Close</button>
+    </div>
+  </div>
+</div>
+    <!-- Notification List -->
+    <div class="notification-list">
+      <!-- Loading -->
+      <div class="loading-state" *ngIf="isLoading">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+      </div>
+
+      <!-- Notifications -->
+    <div 
+  class="notification-item" 
+  *ngFor="let notification of notifications"
+  [class.unread]="notification.status === 'UNREAD'"
+  [class]="getPriorityClass(notification.priority)"
+  (click)="openNotificationDetail(notification, $event)">
+        
+        <!-- Icon -->
+        <div class="notification-icon">
+          <span>{{ getNotificationIcon(notification.type) }}</span>
+        </div>
+
+        <!-- Content -->
+        <div class="notification-content">
+          <div class="notification-header">
+            <h4>{{ notification.subject }}</h4>
+            <span class="time">{{ getTimeAgo(notification.sentAt) }}</span>
+          </div>
+          
+          <p class="message">{{ notification.bodySummary }}</p>
+          
+          <!-- Footer -->
+          <div class="notification-footer">
+            <span class="badge" [class]="getPriorityClass(notification.priority)">
+              {{ notification.priority || 'MEDIUM' }}
+            </span>
+            <span class="new-indicator" *ngIf="notification.status === 'UNREAD'">
+              <svg fill="currentColor" viewBox="0 0 8 8">
+                <circle cx="4" cy="4" r="3" />
+              </svg>
+              New
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="!isLoading && notifications.length === 0">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+        </svg>
+        <h4>No notifications</h4>
+        <p>You're all caught up! 🎉</p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="dropdown-footer">
+      <button class="view-all-btn">
+        View All Notifications
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Backdrop -->
+  <div 
+    class="notification-backdrop" 
+    *ngIf="isDropdownOpen"
+    (click)="closeDropdown()">
+  </div>
+</div>

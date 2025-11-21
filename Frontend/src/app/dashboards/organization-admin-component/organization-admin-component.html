@@ -1,0 +1,1058 @@
+<!-- Main Loader -->
+<div *ngIf="isLoading" class="full-page-loader">
+  <div class="loader-spinner"></div>
+  <div>Loading Dashboard...</div>
+</div>
+
+<!-- Main Dashboard Wrapper -->
+<div class="dashboard-wrapper" *ngIf="!isLoading">
+  <!-- ======================== PENDING STATUS VIEW ======================== -->
+  <div *ngIf="orgStatus === 'PENDING'" class="pending-container">
+    <div class="pending-box">
+      <svg class="pending-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <h2>Application Under Process</h2>
+      <p>Your application is still under review. You will receive an email once verified.</p>
+    </div>
+  </div>
+  <button (click)="logout()" class="floating-logout-button" title="Logout">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+        </svg>
+        <span>Logout</span>
+      </button>
+
+  <!-- ======================== APPROVED STATUS VIEW ======================== -->
+  <div *ngIf="orgStatus === 'APPROVED'" class="dashboard-layout">
+    <!-- ======================== SIDEBAR ======================== -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a routerLink="/" class="logo">Pay<span class="logo-accent">Roll</span></a>
+        
+        <!-- Organization Name -->
+        <div class="org-name-badge">
+          <span class="org-initial">{{ organizationName?.charAt(0) || 'O' }}</span>
+          <span class="org-text">{{ organizationName || 'Organization' }}</span>
+        </div>
+      </div>
+
+      <!-- Profile Section -->
+      <div class="profile-section">
+        <div class="profile-avatar">
+          {{ loggedInUserName ? loggedInUserName.charAt(0).toUpperCase() : 'A' }}
+        </div>
+        <div class="profile-details">
+          <span class="profile-name">{{ loggedInUserName || 'Admin' }}</span>
+          <span class="profile-email">{{ loggedInUserEmail }}</span>
+          <div class="profile-roles">
+            <span class="role-badge" *ngFor="let role of loggedInUserRoles">{{ role }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="sidebar-nav">
+        <a class="nav-item" [class.active]="currentView === 'employees'" (click)="setView('employees')">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+          </svg>
+          <span>Employees</span>
+        </a>
+
+        <a class="nav-item" *ngIf="isOrganization" [class.active]="currentView === 'departments'" (click)="setView('departments')">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
+          </svg>
+          <span>Departments</span>
+        </a>
+
+        <a class="nav-item" *ngIf="isOrganization"[class.active]="currentView === 'salary-grades'" (click)="setView('salary-grades')">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>Salary Grades</span>
+        </a>
+    <a 
+          class="nav-item" 
+          [class.active]="currentView === 'vendors'"
+          (click)="setView('vendors')"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          <span>Vendors</span>
+        </a>
+      </nav>
+        <a class="nav-item" *ngIf="isOrganization" [class.active]="currentView === 'admins'" (click)="setView('admins')">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+          </svg>
+          <span>Admins</span>
+        </a>
+     
+
+      <!-- Sidebar Footer -->
+      <div class="sidebar-footer">
+        <a class="nav-item footer-item" (click)="openProfileModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span>My Profile</span>
+        </a>
+        <a class="nav-item footer-item" (click)="openChangePasswordModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+          </svg>
+          <span>Change Password</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- ======================== MAIN CONTENT ======================== -->
+    <main class="main-content">
+      <!-- Header with Balance -->
+      <header class="main-header">
+        <div class="header-left">
+          <h1>Dashboard</h1>
+          <p class="header-subtitle">Welcome back, {{ loggedInUserName }}!</p>
+        </div>
+
+        <div class="header-right">
+            <app-notification></app-notification>
+          <div *ngIf="isOrganization" class="balance-card">
+            <div class="balance-label">Account Balance</div>
+            <div class="balance-amount" *ngIf="!isLoadingBalance">
+              ₹ {{ accountBalance | number:'1.2-2' }}
+            </div>
+            <div class="balance-amount" *ngIf="isLoadingBalance">
+              <div class="skeleton-text"></div>
+            </div>
+              <button class="btn-add-money" (click)="openAddMoneyModal()" [disabled]="isLoadingBalance">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+    </svg>
+    Add Money
+  </button>
+          </div>
+          <button class="btn btn-primary btn-icon" routerLink="/payroll">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+            </svg>
+            Start New Payroll
+          </button>
+        </div>
+      </header>
+
+      <!-- Stats Grid -->
+      <section class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon employees">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+            </svg>
+          </div>
+          <div class="stat-info">
+            <h4>Total Employees</h4>
+            <p class="stat-number">{{ stats.totalEmployees }}</p>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon departments">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
+            </svg>
+          </div>
+          <div class="stat-info">
+            <h4>Total Departments</h4>
+            <p class="stat-number">{{ stats.totalDepartments }}</p>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon admins">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+            </svg>
+          </div>
+          <div class="stat-info">
+            <h4>Total Admins</h4>
+            <p class="stat-number">{{ stats.totalAdmins }}</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================== EMPLOYEES VIEW ======================== -->
+      <section *ngIf="currentView === 'employees'" class="data-section">
+        <div class="section-header">
+          <h3>Employee Management</h3>
+          <div class="header-actions-inline">
+            <button class="btn btn-secondary btn-sm" (click)="openBatchUploadModal()">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+              </svg>
+              Batch Upload
+            </button>
+            <button class="btn btn-primary btn-sm" (click)="openAddSingleEmployeeModal()">
+              + Add Employee
+            </button>
+          </div>
+        </div>
+        
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Employee Name</th>
+              <th>Department</th>
+      <th>Salary Grade</th> <!-- ✅ NEW COLUMN -->
+      <th>Status</th>
+      <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let emp of paginatedEmployees">
+                <td>
+                  <div class="employee-info">
+                    <strong>{{ emp.empName }}</strong>
+                    <span>{{ emp.empEmail }}</span>
+                  </div>
+                </td>
+            <td>{{ emp.departmentName }}</td>
+      <!-- ✅ NEW: Show salary grade -->
+      <td>
+        <span *ngIf="emp.gradeCode" class="grade-badge">
+          {{ emp.gradeCode }}
+        </span>
+        <span *ngIf="!emp.gradeCode" style="color: var(--text-muted-color);">
+          Not assigned
+        </span>
+      </td>
+      <td>
+        <span class="status-badge" [ngClass]="emp.status.toLowerCase()">
+          {{ emp.status }}
+        </span>
+      </td>
+      <td>
+                  <div class="actions">
+                    <button class="icon-btn edit-btn" (click)="openEditEmployeeModal(emp)" title="Edit">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                      </svg>
+                    </button>
+                    <button class="icon-btn delete-btn" (click)="deleteEmployee(emp.empId)" title="Delete">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="employees.length === 0">
+                <td colspan="3" class="no-data-cell">
+                  <div class="no-data-content">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.182 16.318A4.486 4.486 0 0012.016 15a4.486 4.486 0 00-3.198 1.318M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75zm-.375 0h.008v.015h-.008V9.75zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75zm-.375 0h.008v.015h-.008V9.75z" />
+                    </svg>
+                    <p>No employees found</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Pagination -->
+        <div *ngIf="totalPages > 1" class="pagination-controls">
+          <button class="pagination-btn" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+          </button>
+          <button *ngFor="let page of getPagesArray()" 
+                  class="pagination-btn" 
+                  [class.active]="currentPage === page" 
+                  (click)="goToPage(page)">
+            {{ page }}
+          </button>
+          <button class="pagination-btn" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- ======================== DEPARTMENTS VIEW ======================== -->
+      <section *ngIf="currentView === 'departments'" class="data-section">
+        <div class="section-header">
+          <h3>Department Management</h3>
+          <button class="btn btn-primary btn-sm" (click)="openDepartmentModal()">
+            + New Department
+          </button>
+        </div>
+        
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Department Name</th>
+                      <th>EMPLOYEES</th>   
+                <th>Description</th>
+
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let dept of paginatedDepartments">
+                <td><strong>{{ dept.name }}</strong></td>
+                           <td>
+        <span>{{ dept.employeeCount }}</span>   <!-- ✅ Show count, fallback 0 -->
+      </td>
+                <td>{{ dept.description || 'No description' }}</td>
+     
+                <td>
+                  <div class="actions">
+                    <button class="icon-btn edit-btn" (click)="openDepartmentModal(dept)" title="Edit">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                      </svg>
+                    </button>
+                    <button class="icon-btn delete-btn" (click)="deleteDepartment(dept.departmentId)" title="Delete">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="departments.length === 0">
+                <td colspan="3" class="no-data-cell">
+                  <div class="no-data-content">
+                    <p>No departments found</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ======================== SALARY GRADES VIEW ======================== -->
+      <section *ngIf="currentView === 'salary-grades'" class="data-section">
+        <div class="section-header">
+          <h3>Salary Grades Management</h3>
+          <button class="btn btn-primary btn-sm btn-icon" (click)="openSalaryGradeModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Add Salary Grade</span>
+          </button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Grade Code</th>
+                <th>Basic Salary</th>
+                <th>HRA</th>
+                <th>DA</th>
+                <th>Allowances</th>
+                <th>PF</th>
+                <th>Total Salary</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let grade of salaryGrades">
+                <td><strong>{{ grade.gradeCode }}</strong></td>
+                <td>₹{{ grade.basicSalary | number:'1.2-2' }}</td>
+                <td>₹{{ grade.hra | number:'1.2-2' }}</td>
+                <td>₹{{ grade.da | number:'1.2-2' }}</td>
+                <td>₹{{ grade.allowances | number:'1.2-2' }}</td>
+                <td>₹{{ grade.pf | number:'1.2-2' }}</td>
+                <td><strong>₹{{ calculateTotalSalary(grade) | number:'1.2-2' }}</strong></td>
+                <td>
+                  <div class="actions">
+                    <button class="icon-btn edit-btn" (click)="openSalaryGradeModal(grade)" title="Edit">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </button>
+                    <button class="icon-btn delete-btn" (click)="deleteSalaryGrade(grade.gradeId)" title="Delete">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="salaryGrades.length === 0">
+                <td colspan="8" class="no-data-cell">
+                  <div class="no-data-content">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                    </svg>
+                    <p>No salary grades found. Create one to get started.</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          
+        </div>
+      </section>
+
+      <!-- ======================== ADMINS VIEW ======================== -->
+      <section *ngIf="currentView === 'admins'" class="data-section">
+        <div class="section-header">
+          <h3>Admin Management</h3>
+          <button class="btn btn-primary btn-sm" (click)="openOrgAdminModal()">
+            + New Admin
+          </button>
+        </div>
+        
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Department</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let admin of paginatedAdmins">
+                <td><strong>{{ admin.name }}</strong></td>
+                <td>{{ admin.email }}</td>
+                <td>{{ admin.phone }}</td>
+                <td>{{ admin.departmentName || 'Main Admin' }}</td>
+                <td>
+                  <span class="status-badge" [ngClass]="admin.status.toLowerCase()">
+                    {{ admin.status }}
+                  </span>
+                </td>
+                <td>
+                  <div class="actions">
+                    <button class="icon-btn edit-btn" (click)="openOrgAdminModal(admin)" title="Edit">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                      </svg>
+                    </button>
+                    <button class="icon-btn delete-btn" (click)="deleteAdmin(admin.orgAdminId)" title="Delete">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="admins.length === 0">
+                <td colspan="6" class="no-data-cell">
+                  <div class="no-data-content">
+                    <p>No admins found</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <!-- ======================== VENDORS VIEW ======================== -->
+    <section *ngIf="currentView === 'vendors'" class="vendors-section">
+  <app-vendor-management [orgId]="orgId"></app-vendor-management>
+</section>
+      <!-- Floating Logout Button -->
+      <button (click)="logout()" class="floating-logout-button" title="Logout">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+        </svg>
+        <span>Logout</span>
+      </button>
+    </main>
+  </div>
+</div>
+
+<!-- ======================================================================= -->
+<!-- ======================== MODALS ======================================= -->
+
+<!-- Salary Grade Modal -->
+<div class="modal-overlay" *ngIf="isSalaryGradeModalOpen" (click)="closeSalaryGradeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h3>{{ isEditingSalaryGrade ? 'Edit Salary Grade' : 'Add New Salary Grade' }}</h3>
+    
+    <form [formGroup]="salaryGradeForm" (ngSubmit)="onSalaryGradeSubmit()">
+      <div class="form-group">
+        <label for="gradeCode">Grade Code *</label>
+        <input 
+          type="text" 
+          id="gradeCode" 
+          formControlName="gradeCode" 
+          placeholder="e.g., L1, L2, SR-1"
+          [class.error]="salaryGradeForm.get('gradeCode')?.invalid && salaryGradeForm.get('gradeCode')?.touched">
+        <span class="error-text" *ngIf="salaryGradeForm.get('gradeCode')?.invalid && salaryGradeForm.get('gradeCode')?.touched">
+          Grade code is required (uppercase letters, numbers, and hyphens only)
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="basicSalary">Basic Salary (₹) *</label>
+        <input 
+          type="number" 
+          id="basicSalary" 
+          formControlName="basicSalary" 
+          placeholder="e.g., 30000"
+          min="0"
+          step="0.01">
+      </div>
+
+      <div class="form-group">
+        <label for="hra">HRA (₹) *</label>
+        <input 
+          type="number" 
+          id="hra" 
+          formControlName="hra" 
+          placeholder="e.g., 12000"
+          min="0"
+          step="0.01">
+      </div>
+
+      <div class="form-group">
+        <label for="da">DA (₹) *</label>
+        <input 
+          type="number" 
+          id="da" 
+          formControlName="da" 
+          placeholder="e.g., 5000"
+          min="0"
+          step="0.01">
+      </div>
+
+      <div class="form-group">
+        <label for="allowances">Allowances (₹) *</label>
+        <input 
+          type="number" 
+          id="allowances" 
+          formControlName="allowances" 
+          placeholder="e.g., 3000"
+          min="0"
+          step="0.01">
+      </div>
+
+      <div class="form-group">
+        <label for="pf">PF Deduction (₹) *</label>
+        <input 
+          type="number" 
+          id="pf" 
+          formControlName="pf" 
+          placeholder="e.g., 1800"
+          min="0"
+          step="0.01">
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeSalaryGradeModal()">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="salaryGradeForm.invalid">
+          {{ isEditingSalaryGrade ? 'Update Grade' : 'Create Grade' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Employee Modal -->
+<div class="modal-overlay" *ngIf="isEditEmployeeModalOpen" (click)="closeEditEmployeeModal()">
+  <div class="modal-content modal-compact" (click)="$event.stopPropagation()">
+    <h3>Edit Employee</h3>
+    
+    <form [formGroup]="editEmployeeForm" (ngSubmit)="onEditEmployeeSubmit()">
+      <!-- Row 1: Name & Email -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="editEmpName">Full Name *</label>
+          <input id="editEmpName" type="text" formControlName="empName" />
+        </div>
+        
+        <div class="form-group">
+          <label for="editEmpEmail">Email *</label>
+          <input id="editEmpEmail" type="email" formControlName="empEmail" />
+        </div>
+      </div>
+
+      <!-- Row 2: Phone & Bank Name -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="editPhone">Phone *</label>
+          <input id="editPhone" type="tel" formControlName="phone" />
+        </div>
+        
+        <div class="form-group">
+          <label for="editBankAccountName">Bank Account Name *</label>
+          <input id="editBankAccountName" type="text" formControlName="bankAccountName" />
+        </div>
+      </div>
+
+      <!-- Row 3: Account No & IFSC -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="editBankAccountNo">Bank Account No *</label>
+          <input id="editBankAccountNo" type="text" formControlName="bankAccountNo" />
+        </div>
+        
+        <div class="form-group">
+          <label for="editIfscCode">IFSC Code *</label>
+          <input id="editIfscCode" type="text" formControlName="ifscCode" />
+        </div>
+      </div>
+
+      <!-- Row 4: Department & Salary Grade -->
+      <div class="form-row">
+       <div class="form-group">
+        <label>Department *</label>
+        
+        <!-- ✅ For ROLE_ORGANIZATION: Show dropdown -->
+        <select 
+          *ngIf="isOrganization"
+          formControlName="departmentName">
+          <option [ngValue]="null">Select department</option>
+          <option *ngFor="let dept of departments" [ngValue]="dept.name">
+            {{ dept.name }}
+          </option>
+        </select>
+        
+        <!-- ✅ For ROLE_ORG_ADMIN: Show read-only text -->
+        <div *ngIf="isOrgAdmin" class="readonly-field">
+          <input 
+            type="text" 
+            [value]="userDepartmentName"
+            readonly
+            class="readonly-input"
+          />
+          <small class="text-muted">
+            New employees will be added to your department: {{ userDepartmentName }}
+          </small>
+        </div>
+      </div>
+
+      <!-- Salary Grade -->
+      <div class="form-group">
+        <label>Salary Grade</label>
+        <select formControlName="salaryGradeId">
+          <option [ngValue]="null">-- No Grade --</option>
+          <option *ngFor="let grade of salaryGrades" [ngValue]="grade.gradeId">
+            {{ grade.gradeCode }}
+          </option>
+        </select>
+      </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeEditEmployeeModal()">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="editEmployeeForm.invalid">
+          Update Employee
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- Add Single Employee Modal -->
+<div class="modal-overlay" *ngIf="isAddSingleEmployeeModalOpen" (click)="closeAddSingleEmployeeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h3>Add New Employee</h3>
+    <form [formGroup]="addEmployeeForm" (ngSubmit)="onAddEmployeeSubmit()">
+      <!-- Row 1: Name & Email -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="empName">Full Name *</label>
+          <input id="empName" type="text" formControlName="empName" placeholder="John Doe" />
+        </div>
+        
+        <div class="form-group">
+          <label for="empEmail">Email *</label>
+          <input id="empEmail" type="email" formControlName="empEmail" placeholder="john@example.com" />
+        </div>
+      </div>
+      <!-- Row 2: Phone & Bank Name -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="phone">Phone *</label>
+          <input id="phone" type="tel" formControlName="phone" placeholder="10-digit number" />
+        </div>
+        
+        <div class="form-group">
+          <label for="bankAccountName">Bank Account Name *</label>
+          <input id="bankAccountName" type="text" formControlName="bankAccountName" placeholder="As per bank records" />
+        </div>
+      </div>
+<!-- Row 3: Account No & IFSC -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="bankAccountNo">Bank Account No *</label>
+          <input id="bankAccountNo" type="text" formControlName="bankAccountNo" placeholder="Enter account number" />
+        </div>
+        
+        <div class="form-group">
+          <label for="ifscCode">IFSC Code *</label>
+          <input id="ifscCode" type="text" formControlName="ifscCode" placeholder="e.g., HDFC0001234" />
+        </div>
+      </div>
+     <div class="form-row">
+        <div class="form-group">
+        <label>Department *</label>
+        
+        <!-- ✅ For ROLE_ORGANIZATION: Show dropdown -->
+        <select 
+          *ngIf="isOrganization"
+          formControlName="departmentName">
+          <option [ngValue]="null">Select department</option>
+          <option *ngFor="let dept of departments" [ngValue]="dept.name">
+            {{ dept.name }}
+          </option>
+        </select>
+        
+        <!-- ✅ For ROLE_ORG_ADMIN: Show read-only text -->
+        <div *ngIf="isOrgAdmin" class="readonly-field">
+          <input 
+            type="text" 
+            [value]="userDepartmentName"
+            readonly
+            class="readonly-input"
+          />
+          <small class="text-muted">
+            New employees will be added to your department: {{ userDepartmentName }}
+          </small>
+        </div>
+      </div>
+
+      <!-- Salary Grade -->
+      <div class="form-group">
+        <label>Salary Grade</label>
+        <select formControlName="salaryGradeId">
+          <option [ngValue]="null">-- No Grade --</option>
+          <option *ngFor="let grade of salaryGrades" [ngValue]="grade.gradeId">
+            {{ grade.gradeCode }}
+          </option>
+        </select>
+      </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeAddSingleEmployeeModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="addEmployeeForm.invalid">Save Employee</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Batch Upload Modal -->
+<div class="modal-overlay" *ngIf="isBatchUploadModalOpen" (click)="closeBatchUploadModal()">
+  <div class="modal-content modal-compact" (click)="$event.stopPropagation()">
+    <h3>Batch Upload Employees</h3>
+    <p>Select a department and upload a CSV/Excel file with employee data.</p>
+    
+    <form [formGroup]="batchUploadForm" (ngSubmit)="onBatchUploadSubmit()">
+      
+      <!-- ✅ DEPARTMENT - Conditional rendering based on role -->
+      <div class="form-group">
+        <label for="batchDept">Assign to Department *</label>
+        
+        <!-- ✅ For ROLE_ORGANIZATION: Show dropdown -->
+        <select 
+          *ngIf="isOrganization"
+          id="batchDept" 
+          formControlName="departmentName">
+          <option [ngValue]="null" disabled>Select a department</option>
+          <option *ngFor="let dept of departments" [ngValue]="dept.name">
+            {{ dept.name }}
+          </option>
+        </select>
+        
+        <!-- ✅ For ROLE_ORG_ADMIN: Show read-only text -->
+        <div *ngIf="isOrgAdmin" class="readonly-field">
+          <input 
+            type="text" 
+            [value]="userDepartmentName"
+            readonly
+            class="readonly-input"
+          />
+          <small class="text-muted">
+            Employees will be uploaded to your department: {{ userDepartmentName }}
+          </small>
+        </div>
+      </div>
+
+      <!-- Salary Grade Dropdown - Available for both roles -->
+      <div class="form-group">
+        <label for="batchGrade">Assign Salary Grade (Optional)</label>
+        <select id="batchGrade" formControlName="salaryGradeId">
+          <option [ngValue]="null">-- No Salary Grade --</option>
+          <option *ngFor="let grade of salaryGrades" [ngValue]="grade.gradeId">
+            {{ grade.gradeCode }} - ₹{{ calculateTotalSalary(grade) | number:'1.0-0' }}/month
+          </option>
+        </select>
+      </div>
+
+      <!-- File Upload -->
+      <div class="form-group">
+        <label for="batchFile">CSV or Excel File *</label>
+        <input id="batchFile" type="file" (change)="onFileSelected($event)" accept=".csv, .xlsx, .xls" />
+      </div>
+
+      <!-- Modal Actions -->
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeBatchUploadModal()">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="!batchFile || batchUploadForm.invalid">
+          Upload File
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add/Edit Department Modal -->
+<div class="modal-overlay" *ngIf="isDepartmentModalOpen" (click)="closeDepartmentModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h3>{{ isEditingDepartment ? 'Edit' : 'Create New' }} Department</h3>
+    <form [formGroup]="departmentForm" (ngSubmit)="onDepartmentSubmit()">
+      <div class="form-group">
+        <label for="deptName">Department Name</label>
+        <input id="deptName" type="text" formControlName="name" />
+      </div>
+      <div class="form-group">
+        <label for="deptDesc">Description</label>
+        <input id="deptDesc" type="text" formControlName="description" />
+      </div>
+      
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeDepartmentModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="departmentForm.invalid">
+          Save Department
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add/Edit Org Admin Modal -->
+<div class="modal-overlay" *ngIf="isOrgAdminModalOpen" (click)="closeOrgAdminModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h3>{{ isEditingAdmin ? 'Edit' : 'Add New' }} Admin</h3>
+    <form [formGroup]="orgAdminForm" (ngSubmit)="onAdminSubmit()">
+      <div class="form-group">
+        <label for="adminName">Full Name</label>
+        <input id="adminName" type="text" formControlName="name" />
+      </div>
+      <div class="form-group">
+        <label for="adminEmail">Email</label>
+        <input id="adminEmail" type="email" formControlName="email" />
+      </div>
+      <div class="form-group">
+        <label for="adminPhone">Phone</label>
+        <input id="adminPhone" type="tel" formControlName="phone" />
+      </div>
+      <div class="form-group">
+        <label for="adminDepartment">Assign to Department (Optional)</label>
+        <select id="adminDepartment" formControlName="departmentName">
+          <option [ngValue]="null">-- No Department (Main Admin) --</option>
+          <option *ngFor="let dept of departments" [ngValue]="dept.departmentId">
+            {{ dept.name }}
+          </option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="adminDoc">Profile Document (Optional)</label>
+        <input id="adminDoc" type="file" (change)="onAdminFileSelected($event)" />
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeOrgAdminModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="orgAdminForm.invalid">Save Admin</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Profile Modal -->
+<div class="modal-overlay" *ngIf="isProfileModalOpen" (click)="closeProfileModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h3>My Profile</h3>
+    <form [formGroup]="profileForm" (ngSubmit)="onProfileUpdateSubmit()">
+      <div class="form-group">
+        <label>Email (cannot be changed)</label>
+        <input type="email" [value]="loggedInUserEmail" readonly disabled>
+      </div>
+      <div class="form-group">
+        <label for="profileName">Full Name</label>
+        <input id="profileName" type="text" formControlName="name">
+      </div>
+      <div class="form-group">
+        <label for="profilePhone">Phone</label>
+        <input id="profilePhone" type="tel" formControlName="phone">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeProfileModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid">Update Profile</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal-overlay" *ngIf="isChangePasswordModalOpen" (click)="closeChangePasswordModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h3>Change Your Password</h3>
+    <form [formGroup]="changePasswordForm" (ngSubmit)="onChangePasswordSubmit()">
+      <div class="form-group">
+        <label for="currentPassword">Current Password</label>
+        <input id="currentPassword" type="password" formControlName="currentPassword" />
+      </div>
+      <div class="form-group">
+        <label for="newPassword">New Password</label>
+        <input id="newPassword" type="password" formControlName="newPassword" />
+      </div>
+      <div class="form-group">
+        <label for="confirmPassword">Re-enter New Password</label>
+        <input id="confirmPassword" type="password" formControlName="confirmPassword" />
+        <div *ngIf="changePasswordForm.hasError('passwordMismatch') && changePasswordForm.get('confirmPassword')?.touched" class="error-text">
+          New passwords do not match.
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeChangePasswordModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="isLoading || changePasswordForm.invalid">
+          <span *ngIf="!isLoading">Update Password</span>
+          <span *ngIf="isLoading">Updating...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- ✅ ADD MONEY MODAL - Add at the end of file before closing div -->
+<div class="modal-overlay" *ngIf="isAddMoneyModalOpen" (click)="closeAddMoneyModal()">
+  <div class="modal-content modal-payment" (click)="$event.stopPropagation()">
+    
+    <!-- Modal Header with Icon -->
+    <div class="modal-header-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+      </svg>
+    </div>
+    
+    <h3 class="modal-title">Add Money to Account</h3>
+    <p class="modal-subtitle">Enter the amount you want to add to your organization account</p>
+    
+    <!-- Add Money Form -->
+    <form (ngSubmit)="onAddMoneySubmit()" class="payment-form">
+      
+      <!-- Amount Input -->
+      <div class="form-group">
+        <label for="addMoneyAmount" class="form-label">Amount (₹) *</label>
+        <div class="amount-input-wrapper">
+          <span class="currency-symbol">₹</span>
+          <input 
+            type="number" 
+            id="addMoneyAmount" 
+            [(ngModel)]="addMoneyAmount"
+            name="addMoneyAmount"
+            min="10000"
+            max="10000000"
+            step="1000"
+            placeholder="10,000"
+            class="amount-input"
+            required
+            autocomplete="off"
+          />
+        </div>
+        <small class="input-hint">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+          </svg>
+          Minimum: ₹10,000 | Maximum: ₹1,00,00,000
+        </small>
+      </div>
+
+      <!-- Quick Amount Buttons -->
+      <div class="quick-amounts">
+        <button 
+          type="button" 
+          class="quick-amount-btn" 
+          [class.active]="addMoneyAmount === 10000"
+          (click)="setQuickAmount(10000)"
+        >
+          ₹10,000
+        </button>
+        <button 
+          type="button" 
+          class="quick-amount-btn" 
+          [class.active]="addMoneyAmount === 50000"
+          (click)="setQuickAmount(50000)"
+        >
+          ₹50,000
+        </button>
+        <button 
+          type="button" 
+          class="quick-amount-btn" 
+          [class.active]="addMoneyAmount === 100000"
+          (click)="setQuickAmount(100000)"
+        >
+          ₹1,00,000
+        </button>
+        <button 
+          type="button" 
+          class="quick-amount-btn" 
+          [class.active]="addMoneyAmount === 500000"
+          (click)="setQuickAmount(500000)"
+        >
+          ₹5,00,000
+        </button>
+      </div>
+
+      <!-- Payment Info Box -->
+      <div class="payment-info-box">
+        <div class="info-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+          </svg>
+        </div>
+        <div class="info-content">
+          <strong>Secure Payment</strong>
+          <p>Your payment will be processed instantly and added to your account balance</p>
+        </div>
+      </div>
+
+      <!-- Modal Actions -->
+      <div class="modal-actions">
+        <button 
+          type="button" 
+          class="btn btn-secondary" 
+          (click)="closeAddMoneyModal()"
+          [disabled]="isLoading"
+        >
+          Cancel
+        </button>
+        <button 
+          type="submit" 
+          class="btn btn-success" 
+          [disabled]="isLoading || addMoneyAmount < 10000 || addMoneyAmount > 10000000"
+        >
+          <svg *ngIf="!isLoading" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span class="btn-spinner" *ngIf="isLoading"></span>
+          <span *ngIf="!isLoading">Add ₹{{ addMoneyAmount | number:'1.0-0' }}</span>
+          <span *ngIf="isLoading">Processing...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,907 @@
+<!-- bank-admin.component.html -->
+<!-- Maine layout ko theek karne ke liye HTML structure ko thoda aage-peeche kiya hai -->
+<div class="dashboard-container" [class.dark-mode]="isDarkMode" *ngIf="!isLoading">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        Pay<span class="logo-accent">Roll</span>
+        <span class="admin-badge">Bank Admin</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button
+        class="nav-item"
+        [class.active]="currentView === 'pending'"
+        (click)="setView('pending')"
+      >
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <span>Pending Requests</span>
+        <span class="badge" *ngIf="(pendingOrgs$ | async)?.length">{{
+          (pendingOrgs$ | async)?.length
+        }}</span>
+      </button>
+
+      <button
+        class="nav-item"
+        [class.active]="currentView === 'approved'"
+        (click)="setView('approved')"
+      >
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <span>Active Organizations</span>
+      </button>
+
+      <button
+        class="nav-item"
+        [class.active]="currentView === 'salary-requests'"
+        (click)="setView('salary-requests')"
+      >
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <span>Salary Requests</span>
+        <span class="badge badge-alert" *ngIf="pendingSalaryCount > 0">{{
+          pendingSalaryCount
+        }}</span>
+      </button>
+
+      <button
+        class="nav-item"
+        [class.active]="currentView === 'vendor-payments'"
+        (click)="setView('vendor-payments')"
+      >
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+          />
+        </svg>
+        <span>Vendor Payments</span>
+        <span class="badge badge-alert" *ngIf="pendingPaymentCount > 0">{{
+          pendingPaymentCount
+        }}</span>
+      </button>
+
+      <button
+        class="nav-item"
+        [class.active]="currentView === 'messages'"
+        (click)="setView('messages')"
+      >
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+          />
+        </svg>
+        <span>Support Inbox</span>
+        <span class="badge badge-alert" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+      </button>
+      <button 
+          class="nav-item" 
+          [class.active]="currentView === 'audit-logs'"
+          (click)="setView('audit-logs')">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <span>Audit Logs</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="logout-btn" (click)="logout()">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+          />
+        </svg>
+        <span>Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <!-- Maine yahaan [class.full-width-view] add kiya hai taaki jab audit logs dikhe toh padding hatt jaaye -->
+  <main class="main-content" [class.full-width-view]="currentView === 'audit-logs'">
+
+    <!-- Yeh container sirf tab dikhega jab audit logs active NAHI hai -->
+    <ng-container *ngIf="currentView !== 'audit-logs'">
+      <header class="content-header">
+        <div>
+          <h1 class="page-title">Bank Admin Dashboard</h1>
+          <p class="page-subtitle">Manage organizations and requests</p>
+        </div>
+        <button (click)="toggleTheme()" class="theme-toggle-btn" title="Toggle Dark Mode">
+          <svg *ngIf="!isDarkMode" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+            />
+          </svg>
+          <svg *ngIf="isDarkMode" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+            />
+          </svg>
+        </button>
+      </header>
+
+      <!-- Stats Cards -->
+      <section class="stats-grid">
+        <div class="stat-card pending-card" (click)="setView('pending')">
+          <div class="stat-icon pending-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+          <div class="stat-content"><p class="stat-label">Pending Approvals</p><p class="stat-value">{{ (pendingOrgs$ | async)?.length || 0 }}</p></div>
+        </div>
+        <div class="stat-card approved-card" (click)="setView('approved')">
+          <div class="stat-icon approved-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+          <div class="stat-content"><p class="stat-label">Active Organizations</p><p class="stat-value">{{ (approvedOrgs$ | async)?.length || 0 }}</p></div>
+        </div>
+        <div class="stat-card salary-card" (click)="setView('salary-requests')">
+          <div class="stat-icon salary-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg></div>
+          <div class="stat-content"><p class="stat-label">Salary Requests</p><p class="stat-value">{{ pendingSalaryCount || 0 }}</p></div>
+        </div>
+        <div class="stat-card messages-card" (click)="setView('messages')">
+          <div class="stat-icon messages-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div>
+          <div class="stat-content"><p class="stat-label">Unread Messages</p><p class="stat-value">{{ unreadCount || 0 }}</p></div>
+        </div>
+        <div class="stat-card" (click)="setView('vendor-payments')" style="border-left: 4px solid #f59e0b;">
+          <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg></div>
+          <div class="stat-content"><p class="stat-label">Vendor Payment Requests</p><p class="stat-value">{{ pendingPaymentCount || 0 }}</p></div>
+        </div>
+      </section>
+    </ng-container>
+
+    <!-- Views Container -->
+    <ng-container [ngSwitch]="currentView">
+      <!-- Pending Organizations -->
+      <section *ngSwitchCase="'pending'" class="data-section fade-in">
+        <div class="section-header">
+          <h3>Pending Organization Requests</h3>
+          <p class="section-subtitle">Review and approve new organization registrations</p>
+        </div>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead><tr><th>Organization</th><th>Contact</th><th>Registered On</th><th class="text-right">Actions</th></tr></thead>
+            <tbody>
+              <tr *ngFor="let org of pendingOrgs$ | async" class="table-row">
+                <td><div class="org-cell"><div class="org-avatar">{{ org.orgName?.charAt(0) }}</div><div><p class="org-name">{{ org.orgName }}</p><p class="org-meta">ID: #{{ org.orgId }}</p></div></div></td>
+                <td><div class="contact-cell"><p class="contact-email">{{ org.email }}</p><p class="contact-phone">{{ org.phone }}</p></div></td>
+                <td><span class="date-text">{{ org.createdAt | date : 'MMM d, y' }}</span><span class="time-text">{{ org.createdAt | date : 'h:mm a' }}</span></td>
+                <td class="text-right"><div class="action-buttons"><button class="btn btn-icon btn-secondary" (click)="openDetailsModal(org)" title="View Details"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg></button><button class="btn btn-success" (click)="approveOrganization(org.orgId)"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>Approve</button><button class="btn btn-danger" (click)="openRejectModal(org)"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>Reject</button></div></td>
+              </tr>
+              <tr *ngIf="(pendingOrgs$ | async)?.length === 0"><td colspan="4" class="empty-state"><div class="empty-state-content"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><p>No pending requests</p><span>All caught up! Great job.</span></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Active Organizations -->
+      <section *ngSwitchCase="'approved'" class="data-section fade-in">
+        <div class="section-header"><h3>Active Organizations</h3><p class="section-subtitle">Manage approved organizations</p></div>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead><tr><th>Organization</th><th>Contact</th><th>Status</th><th class="text-right">Actions</th></tr></thead>
+            <tbody>
+              <tr *ngFor="let org of approvedOrgs$ | async" class="table-row">
+                <td><div class="org-cell"><div class="org-avatar approved">{{ org.orgName?.charAt(0) }}</div><div><p class="org-name">{{ org.orgName }}</p><p class="org-meta">ID: #{{ org.orgId }}</p></div></div></td>
+                <td><div class="contact-cell"><p class="contact-email">{{ org.email }}</p><p class="contact-phone">{{ org.phone }}</p></div></td>
+                <td><span class="status-badge" [class.status-approved]="org.status === 'APPROVED'" [class.status-deleted]="org.status === 'DELETED'">{{ org.status }}</span></td>
+                <td class="text-right"><div class="action-buttons"><button class="btn btn-secondary" (click)="updateorg()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>Update</button><button class="btn btn-danger" [disabled]="org.status === 'DELETED'" (click)="deleteOrg(org.orgId)"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>Delete</button></div></td>
+              </tr>
+              <tr *ngIf="(approvedOrgs$ | async)?.length === 0"><td colspan="4" class="empty-state"><div class="empty-state-content"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg><p>No active organizations</p><span>No organizations have been approved yet.</span></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Salary Requests View -->
+      <section *ngSwitchCase="'salary-requests'" class="data-section fade-in">
+        <div class="section-header"><h3>Pending Salary Requests</h3><p class="section-subtitle">Review and approve salary disbursal requests</p></div>
+        <div class="empty-state" *ngIf="(pendingSalaryRequests$ | async)?.length === 0"><div class="empty-state-content"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg><p>No Pending Requests</p><span>There are no salary disbursal requests waiting for approval.</span></div></div>
+        <div class="salary-requests-grid" *ngIf="(pendingSalaryRequests$ | async)?.length">
+          <div class="salary-request-card" *ngFor="let request of pendingSalaryRequests$ | async" (click)="openSalaryDetailsModal(request)">
+            <div class="request-header"><div class="org-info"><div class="org-avatar">{{ request.orgName ? request.orgName.charAt(0).toUpperCase() : 'O' }}</div><div class="org-details"><h3>{{ request.orgName }}</h3><span class="request-period">{{ request.period }}</span></div></div><span class="status-badge status-pending">{{ request.status }}</span></div>
+            <div class="request-stats"><div class="stat-item"><span class="stat-label">Total People</span><span class="stat-value">{{ request.lines?.length || 0 }}</span></div><div class="stat-item"><span class="stat-label">Total Amount</span><span class="stat-value amount">₹{{ request.totalAmount | number : '1.0-0' }}</span></div><div class="stat-item"><span class="stat-label">Submitted</span><span class="stat-value">{{ request.createdAt | date : 'short' }}</span></div></div>
+            <div class="request-actions"><button class="btn-view-details" (click)="openSalaryDetailsModal(request); $event.stopPropagation()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>View Details</button></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Vendor Payment Requests -->
+ <section *ngSwitchCase="'vendor-payments'" class="data-section fade-in">
+  <div class="section-header">
+    <h3>Vendor Payment Requests</h3>
+    <p class="section-subtitle">Review and approve vendor payment requests from organizations</p>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="(pendingPaymentRequests$ | async)?.length === 0">
+    <div class="empty-state-content">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+      </svg>
+      <p>No Pending Payment Requests</p>
+      <span>All vendor payment requests have been processed.</span>
+    </div>
+  </div>
+
+  <!-- Payment Requests Grid -->
+  <div class="salary-requests-grid" *ngIf="(pendingPaymentRequests$ | async)?.length">
+    <div class="salary-request-card" *ngFor="let request of pendingPaymentRequests$ | async">
+      
+      <!-- Card Header -->
+      <div class="request-header">
+        <div class="org-info">
+          <div class="org-avatar">{{ request.orgName ? request.orgName.charAt(0).toUpperCase() : 'O' }}</div>
+          <div class="org-details">
+            <h3>{{ request.orgName || 'Unknown Organization' }}</h3>
+            <span class="request-period">Vendor: {{ request.vendorName || 'Unknown Vendor' }}</span>
+            <!-- VENDOR TYPE BADGE ADDED HERE -->
+            <span class="vendor-type-badge" *ngIf="request?.vendorType">{{ request?.vendorType }}</span>
+          </div>
+        </div>
+        <span class="status-badge status-pending">{{ request.status }}</span>
+      </div>
+
+      <!-- Card Stats -->
+      <div class="request-stats">
+        <div class="stat-item">
+          <span class="stat-label">Request ID</span>
+          <span class="stat-value">#{{ request.paymentId }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Amount</span>
+          <span class="stat-value amount">₹{{ request.amount | number : '1.2-2' }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Requested</span>
+          <span class="stat-value">{{ request.createdAt | date : 'short' }}</span>
+        </div>
+      </div>
+
+      <!-- Card Actions -->
+      <div class="request-actions">
+        <button class="btn-view-details" (click)="openPaymentDetailsModal(request)">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+          View Details
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+      <!-- Support Inbox -->
+      <section *ngSwitchCase="'messages'" class="data-section fade-in">
+        <div class="section-header"><h3>Support Inbox</h3><p class="section-subtitle">Manage customer support messages</p></div>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead><tr><th>From</th><th>Subject</th><th>Received On</th><th>Status</th><th class="text-right">Actions</th></tr></thead>
+            <tbody>
+              <tr *ngFor="let msg of contactMessages$ | async" class="table-row" [class.unread-row]="msg.status === 'UNREAD'">
+                <td><div class="sender-cell"><div class="sender-avatar">{{ msg.name?.charAt(0) }}</div><div><p class="sender-name">{{ msg.name }}</p><p class="sender-email">{{ msg.email }}</p></div></div></td>
+                <td><p class="message-subject">{{ msg.subject }}</p></td>
+                <td><span class="date-text">{{ msg.createdAt | date : 'MMM d, y' }}</span><span class="time-text">{{ msg.createdAt | date : 'h:mm a' }}</span></td>
+                <td><span class="status-badge" [class.status-unread]="msg.status === 'UNREAD'" [class.status-read]="msg.status === 'READ'">{{ msg.status }}</span></td>
+                <td class="text-right"><div class="action-buttons"><button class="btn btn-secondary"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>View</button><button *ngIf="msg.status === 'UNREAD'" class="btn btn-primary" (click)="markAsRead(msg.id)"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>Mark Read</button></div></td>
+              </tr>
+              <tr *ngIf="(contactMessages$ | async)?.length === 0"><td colspan="5" class="empty-state"><div class="empty-state-content"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg><p>Inbox is empty</p><span>No messages to display.</span></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </ng-container>
+
+    <!-- Audit Logs View -->
+    <!-- Yeh component ab main content ke andar hai aur tabhi dikhega jab currentView 'audit-logs' hai -->
+    <div *ngIf="currentView === 'audit-logs'" class="audit-logs-container fade-in">
+      <app-bank-admin-audit-log></app-bank-admin-audit-log>
+    </div>
+  </main>
+</div>
+
+<!-- Loading State -->
+<div *ngIf="isLoading" class="loading-overlay">
+  <div class="loading-spinner"></div>
+  <p>Loading dashboard...</p>
+</div>
+
+<!-- Modal 1: Approval Modal -->
+<div class="modal-overlay" *ngIf="isApprovalModalOpen" (click)="closeApprovalModal()">
+  <div class="modal-container approval-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-header-content">
+        <div class="approval-icon-wrapper">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </div>
+        <div>
+          <h3>Approve Salary Request</h3>
+          <p class="modal-subtitle">Add an optional approval comment</p>
+        </div>
+      </div>
+      <button class="modal-close" (click)="closeApprovalModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="approval-message">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <p>Are you sure you want to approve this salary disbursal request?</p>
+      </div>
+
+      <div class="form-group">
+        <label for="approval-comment">Approval Comment (Optional)</label>
+        <textarea
+          id="approval-comment"
+          [(ngModel)]="approvalComment"
+          rows="4"
+          placeholder="e.g., Approved after verification, All documents verified..."
+          class="form-textarea"
+          maxlength="500"
+        >
+        </textarea>
+        <span class="character-count">{{ approvalComment.length }}/500</span>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeApprovalModal()">Cancel</button>
+      <button class="btn btn-success" (click)="confirmApproval()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 13l4 4L19 7"
+          />
+        </svg>
+        Approve Request
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal 2: Salary Rejection Modal -->
+<div class="modal-overlay" *ngIf="isRejectSalaryModalOpen" (click)="closeRejectSalaryModal()">
+  <div class="modal-container rejection-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-header-content">
+        <div class="rejection-icon-wrapper">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <div>
+          <h3>Reject Salary Request</h3>
+          <p class="modal-subtitle">Provide a reason for rejection</p>
+        </div>
+      </div>
+      <button class="modal-close" (click)="closeRejectSalaryModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="rejection-message">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p>Are you sure you want to reject this salary disbursal request? This action cannot be undone.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="rejection-reason">Rejection Reason <span class="required">*</span></label>
+        <textarea 
+          id="rejection-reason"
+          [(ngModel)]="salaryRejectionReason"
+          rows="4"
+          placeholder="e.g., Insufficient documentation, Invalid request, Budget constraints..."
+          class="form-textarea"
+          maxlength="500"
+          required>
+        </textarea>
+        <span class="character-count">{{ salaryRejectionReason.length }}/500</span>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeRejectSalaryModal()">
+        Cancel
+      </button>
+      <button 
+        class="btn btn-danger" 
+        (click)="confirmSalaryRejection()"
+        [disabled]="!salaryRejectionReason.trim()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        Confirm Rejection
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal 3: Payment Rejection Modal -->
+<div class="modal-overlay" *ngIf="isPaymentRejectionModalOpen" (click)="closePaymentRejectionModal()">
+  <div class="modal-container rejection-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-header-content">
+        <div class="rejection-icon-wrapper">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <div>
+          <h3>Reject Payment Request</h3>
+          <p class="modal-subtitle">Provide a reason for rejection</p>
+        </div>
+      </div>
+      <button class="modal-close" (click)="closePaymentRejectionModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="rejection-message">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p>Are you sure you want to reject this vendor payment request? This action cannot be undone.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="payment-rejection-reason">Rejection Reason <span class="required">*</span></label>
+        <textarea 
+          id="payment-rejection-reason"
+          [(ngModel)]="paymentRejectionReason"
+          rows="4"
+          placeholder="e.g., Incorrect invoice, Duplicate payment, Service not rendered..."
+          class="form-textarea"
+          maxlength="500"
+          required>
+        </textarea>
+        <span class="character-count">{{ paymentRejectionReason.length }}/500</span>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closePaymentRejectionModal()">
+        Cancel
+      </button>
+      <button 
+        class="btn btn-danger" 
+        (click)="confirmPaymentRejection()"
+        [disabled]="!paymentRejectionReason.trim()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        Confirm Rejection
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal 4: Payment Details Modal -->
+<div class="modal-overlay" *ngIf="isPaymentDetailsModalOpen" (click)="closePaymentDetailsModal()">
+  <div class="modal-container salary-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Vendor Payment Details</h2>
+      <button class="modal-close" (click)="closePaymentDetailsModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+    <div class="modal-body" *ngIf="selectedPaymentRequest">
+      <div class="salary-summary-grid">
+        <div class="summary-card">
+          <div class="summary-icon org-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+          </div>
+          <div class="summary-content">
+            <span class="summary-label">Organization</span>
+            <span class="summary-value">{{ selectedPaymentRequest.orgName }}</span>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon people-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+          </div>
+          <div class="summary-content">
+            <span class="summary-label">Vendor</span>
+            <span class="summary-value">{{ selectedPaymentRequest.vendorName }}</span>
+          </div>
+        </div>
+        <div class="summary-card highlight-card" style="grid-column: span 2;">
+          <div class="summary-icon amount-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+          </div>
+          <div class="summary-content">
+            <span class="summary-label">Amount Requested</span>
+            <span class="summary-value amount">₹{{ selectedPaymentRequest.amount | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="salary-breakdown-section">
+        <div class="breakdown-header">
+          <h4>Bank Account Details</h4>
+        </div>
+        <div class="details-grid" style="grid-template-columns: 1fr 1fr; padding: 1rem 0;">
+          <div class="detail-item">
+            <label>Bank Name</label>
+            <p>{{ selectedPaymentRequest.bankName }}</p>
+          </div>
+          <div class="detail-item">
+            <label>Account Number</label>
+            <p>{{ selectedPaymentRequest.bankAccountNo }}</p>
+          </div>
+          <div class="detail-item">
+            <label>IFSC Code</label>
+            <p>{{ selectedPaymentRequest.ifscCode }}</p>
+          </div>
+          <div class="detail-item">
+            <label>Request ID</label>
+            <p>#{{ selectedPaymentRequest.paymentId }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closePaymentDetailsModal()">Cancel</button>
+      <button class="btn btn-danger" (click)="rejectPaymentRequest(selectedPaymentRequest?.paymentId)">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        Reject
+      </button>
+      <button class="btn btn-success" (click)="approvePaymentRequest(selectedPaymentRequest?.paymentId)">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+        Approve
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal 5: Organization Details Modal -->
+<div class="modal-overlay" *ngIf="isDetailsModalOpen" (click)="closeDetailsModal()">
+  <div class="modal-container large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Organization Details</h3>
+      <button class="modal-close" (click)="closeDetailsModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="details-header">
+        <div class="details-avatar">{{ selectedOrg?.orgName?.charAt(0) }}</div>
+        <div>
+          <h4>{{ selectedOrg?.orgName }}</h4>
+          <span class="status-badge status-pending">{{ selectedOrg?.status }}</span>
+        </div>
+      </div>
+
+      <div class="details-grid">
+        <div class="detail-item">
+          <label>Email Address</label>
+          <p>{{ selectedOrg?.email }}</p>
+        </div>
+        <div class="detail-item">
+          <label>Phone Number</label>
+          <p>{{ selectedOrg?.phone }}</p>
+        </div>
+        <div class="detail-item full-width">
+          <label>Address</label>
+          <p>{{ selectedOrg?.address }}</p>
+        </div>
+        <div class="detail-item">
+          <label>Organization ID</label>
+          <p>#{{ selectedOrg?.orgId }}</p>
+        </div>
+        <div class="detail-item">
+          <label>Registration Date</label>
+          <p>{{ selectedOrg?.createdAt | date : 'medium' }}</p>
+        </div>
+      </div>
+
+      <div class="documents-section">
+        <h4>Verification Documents</h4>
+        <ng-container *ngIf="selectedOrg?.verificationDocs?.length; else noDocs">
+          <div class="document-list">
+            <a
+              *ngFor="let doc of selectedOrg?.verificationDocs"
+              [href]="doc.cloudUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="document-item"
+            >
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+              <span>{{ doc.docType || 'View Document' }}</span>
+            </a>
+          </div>
+        </ng-container>
+        <ng-template #noDocs>
+          <p class="no-docs">No documents were uploaded.</p>
+        </ng-template>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" (click)="closeDetailsModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal 6: Salary Details Modal -->
+<div class="modal-overlay" *ngIf="isSalaryDetailsModalOpen" (click)="closeSalaryDetailsModal()">
+  <div class="modal-container salary-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Salary Disbursal Request Details</h2>
+      <button class="modal-close" (click)="closeSalaryDetailsModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body" *ngIf="selectedSalaryRequest">
+      <div class="salary-summary-grid">
+        <div class="summary-card">
+          <div class="summary-icon org-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+              />
+            </svg>
+          </div>
+          <div class="summary-content">
+            <span class="summary-label">Organization</span>
+            <span class="summary-value">{{ selectedSalaryRequest.orgName }}</span>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-icon period-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+          <div class="summary-content">
+            <span class="summary-label">Period</span>
+            <span class="summary-value">{{ selectedSalaryRequest.period }}</span>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-icon people-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              />
+            </svg>
+          </div>
+          <div class="summary-content">
+            <span class="summary-label">Total People</span>
+            <span class="summary-value">{{ selectedSalaryRequest.lines?.length }}</span>
+          </div>
+        </div>
+
+        <div class="summary-card highlight-card">
+          <div class="summary-icon amount-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+              />
+            </svg>
+          </div>
+          <div class="summary-content">
+            <span class="summary-label">Total Amount</span>
+            <span class="summary-value amount">₹{{ selectedSalaryRequest.totalAmount | number : '1.0-0' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="balance-warning" *ngIf="selectedSalaryRequest.orgBalance < selectedSalaryRequest.totalAmount">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <div>
+          <h4>Insufficient Balance</h4>
+          <p>Organization balance (₹{{ selectedSalaryRequest.orgBalance | number:'1.0-0' }}) is less than required amount (₹{{ selectedSalaryRequest.totalAmount | number:'1.0-0' }})</p>
+        </div>
+      </div>
+
+      <div class="remarks-section" *ngIf="selectedSalaryRequest.remarks">
+        <div class="remarks-header">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+          <h4>Remarks</h4>
+        </div>
+        <p class="remarks-text">{{ selectedSalaryRequest.remarks }}</p>
+      </div>
+
+      <div class="salary-breakdown-section">
+        <div class="breakdown-header">
+          <h4>Salary Breakdown ({{ selectedSalaryRequest.lines?.length }} People)</h4>
+          <span class="privacy-badge">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+              />
+            </svg>
+            Privacy Protected
+          </span>
+        </div>
+
+        <div class="breakdown-table-wrapper">
+          <table class="breakdown-table">
+            <thead>
+              <tr>
+                <th>Employee ID</th>
+                <th>Name</th>
+                <th class="text-right">Gross Salary</th>
+                <th class="text-right">Deductions</th>
+                <th class="text-right">Net Salary</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let line of selectedSalaryRequest.lines; let i = index">
+                <td>
+                  <span class="employee-id">EMP-{{ i + 1 | number : '4.0-0' }}</span>
+                </td>
+                <td>
+                  <span class="employee-name">{{ line.employeeName }}</span>
+                </td>
+                <td class="text-right">
+                  <span class="amount-value">₹{{ line.grossSalary | number : '1.0-0' }}</span>
+                </td>
+                <td class="text-right">
+                  <span class="deduction-value">-₹{{ line.deductions | number : '1.0-0' }}</span>
+                </td>
+                <td class="text-right">
+                  <span class="net-value">₹{{ line.netAmount | number : '1.0-0' }}</span>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="total-row">
+                <td colspan="4" class="text-right"><strong>Total Net Payable:</strong></td>
+                <td class="text-right">
+                  <span class="total-amount">₹{{ selectedSalaryRequest.totalAmount | number : '1.0-0' }}</span>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeSalaryDetailsModal()">Cancel</button>
+      <button
+        class="btn btn-danger"
+        (click)="rejectSalaryRequest(selectedSalaryRequest?.disbursalId)"
+      >
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+        Reject
+      </button>
+      <button
+        class="btn btn-success"
+        (click)="approveSalaryRequest(selectedSalaryRequest?.disbursalId)"
+      >
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 13l4 4L19 7"
+          />
+        </svg>
+        Approve
+      </button>
+    </div>
+  </div>
+  
+</div>

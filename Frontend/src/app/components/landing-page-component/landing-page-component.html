@@ -1,0 +1,112 @@
+<!-- =========== Header & Navigation Bar ===========
+<!-- Header Navigation Bar -->
+<!-- <header class="navbar">
+  <div class="container nav-container"> -->
+    <!-- Logo -->
+    <!-- <a routerLink="/" class="logo">
+      Pay<span class="logo-accent">Roll</span>
+    </a> -->
+
+    <!-- Navigation Links -->
+    <!-- <nav class="nav-links">
+      <a routerLink="/about" class="nav-link">About Us</a>
+      <a routerLink="/contact" class="nav-link">Contact Us</a>
+      <a routerLink="/login" class="nav-link nav-link-login">Login</a>
+      <a routerLink="/register" class="nav-link nav-link-register">Register as Org</a> -->
+
+      <!-- Theme Toggle (no change in structure; now uses service-backed isDarkMode) -->
+      <!-- <button (click)="toggleTheme()" class="theme-toggle" aria-label="Toggle theme"> -->
+        <!-- Moon icon when light -->
+        <!-- <svg *ngIf="!isDarkMode" xmlns="http://www.w3.org/2000/svg" fill="none"
+             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75
+                   0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21
+                   12.75 21a9.753 9.753 0 009.002-5.998z" />
+        </svg> -->
+        <!-- Sun icon when dark -->
+        <!-- <svg *ngIf="isDarkMode" xmlns="http://www.w3.org/2000/svg" fill="none"
+             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386
+                   6.364l-1.591-1.591M12 18.75V21m-4.95-4.243l-1.59-1.591M3.75
+                   12H6m4.243-4.95l1.59-1.591M12 6.75A5.25 5.25 0 006.75
+                   12a5.25 5.25 0 005.25 5.25a5.25 5.25 0 005.25-5.25A5.25
+                   5.25 0 0012 6.75z" />
+        </svg>
+      </button>
+    </nav> --> 
+
+    <!-- Mobile Menu Button (no change) -->
+    <!-- <button class="mobile-menu-button">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none"
+           viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 6h16M4 12h16m-7 6h7" />
+      </svg>
+    </button>
+  </div>
+</header> -->
+
+<!-- =========== Main Content =========== -->
+<main>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container hero-content">
+            <h1>Streamline Your Payroll & Payments</h1>
+            <p>
+                A secure, multi-role platform to manage salary disbursements and client payments, approved by your bank. Effortless, fast, and reliable.
+            </p>
+            <a routerLink="/register" class="cta-button">
+                Get Started for Free
+            </a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Why Choose PayRoll?</h2>
+                <p>Everything you need in one powerful platform.</p>
+            </div>
+
+            <div class="features-grid">
+                <!-- Feature 1 -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                    </div>
+                    <h3>Bank-Grade Security</h3>
+                    <p>All transactions are verified and approved through a secure pipeline, ensuring your data and funds are always safe.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                    </div>
+                    <h3>Dedicated Dashboards</h3>
+                    <p>Separate, intuitive dashboards for Bank Admins, Organizations, and Employees. Everyone sees only what they need.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    </div>
+                    <h3>Insightful Reports</h3>
+                    <p>Generate and download detailed financial reports in PDF and Excel formats with powerful filters for date, month, or year.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- =========== Footer =========== -->
+<footer class="footer">
+    <div class="container">
+        <p>&copy; 2025 PayRoll. All Rights Reserved. Built for Capstone Project.</p>
+        <p>By Jayesh Pinagle & Ashwini Dagale</p>
+    </div>
+</footer>

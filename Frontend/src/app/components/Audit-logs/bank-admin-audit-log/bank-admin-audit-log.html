@@ -1,0 +1,119 @@
+<!-- bank-admin-audit-log.component.html -->
+<div class="audit-container" [class.dark-mode]="isDarkMode">
+  <!-- Header -->
+  <div class="audit-header">
+    <div class="header-left">
+      <h1 class="page-title">
+        <svg class="title-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        Audit Logs
+      </h1>
+      <p class="subtitle">Track all system activities and user actions</p>
+    </div>
+    <div class="header-right">
+      <button class="export-btn" (click)="exportToCSV()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+        Export CSV
+      </button>
+    </div>
+  </div>
+
+  <div class="content-wrapper">
+    <!-- Stats Area -->
+    <div class="stats-area">
+      <div class="stats-bar">
+        <!-- Stat Card 1: Total Logs -->
+        <div class="stat-item">
+          <div class="stat-icon total-logs-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Total Logs</span>
+            <span class="stat-value">{{ totalLogs }}</span>
+          </div>
+        </div>
+        <!-- Stat Card 2: Filtered Results -->
+        <div class="stat-item">
+          <div class="stat-icon filtered-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Filtered Results</span>
+            <span class="stat-value">{{ filteredLogs.length }}</span>
+          </div>
+        </div>
+        <!-- Stat Card 3: Current Page -->
+        <div class="stat-item">
+          <div class="stat-icon page-icon">
+             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Current Page</span>
+            <span class="stat-value">{{ currentPage }} / {{ totalPages }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters & Table Area -->
+    <div class="main-area">
+      <!-- Filters -->
+      <div class="filters-card">
+        <div class="filters-header">
+          <h3 class="filters-title">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+            Filters
+          </h3>
+          <button class="clear-filters-btn" (click)="clearFilters()">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            Clear All
+          </button>
+        </div>
+        <div class="filters-grid">
+          <div class="filter-group"><label class="filter-label">Search</label><input type="text" class="filter-input" placeholder="Search by email, action, etc." [(ngModel)]="searchQuery" (ngModelChange)="applyFilters()"/></div>
+          <div class="filter-group"><label class="filter-label">Role</label><select class="filter-select" [(ngModel)]="selectedRole" (ngModelChange)="applyFilters()"><option *ngFor="let role of roles" [value]="role">{{ role === 'all' ? 'All Roles' : role }}</option></select></div>
+          <div class="filter-group"><label class="filter-label">Action</label><select class="filter-select" [(ngModel)]="selectedAction" (ngModelChange)="applyFilters()"><option *ngFor="let action of actions" [value]="action">{{ action === 'all' ? 'All Actions' : action }}</option></select></div>
+          <div class="filter-group"><label class="filter-label">Resource Type</label><select class="filter-select" [(ngModel)]="selectedResourceType" (ngModelChange)="applyFilters()"><option *ngFor="let type of resourceTypes" [value]="type">{{ type === 'all' ? 'All Resources' : type }}</option></select></div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-container"><div class="loading-spinner"></div><p>Loading audit logs...</p></div>
+
+      <!-- Empty State -->
+      <div *ngIf="!isLoading && filteredLogs.length === 0" class="empty-state">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+        <h3>No Audit Logs Found</h3><p>Try adjusting your filters to see more results.</p>
+      </div>
+
+      <!-- Table -->
+      <div *ngIf="!isLoading && filteredLogs.length > 0" class="table-card">
+        <div class="table-wrapper">
+          <table class="audit-table">
+            <thead><tr><th>ID</th><th>User</th><th>Role</th><th>Action</th><th>Resource</th><th>Resource ID</th><th>Timestamp</th></tr></thead>
+            <tbody>
+              <tr *ngFor="let log of getPaginatedLogs()">
+                <td class="log-id">#{{ log.logId }}</td>
+                <td class="user-info"><div class="user-avatar">{{ log.performedByEmail.charAt(0).toUpperCase() }}</div><div class="user-details"><span class="user-email">{{ log.performedByEmail }}</span><span class="user-id">ID: {{ log.performedByUserId }}</span></div></td>
+                <td><span class="role-badge" [ngClass]="getRoleBadgeClass(log.performedByRole)">{{ log.performedByRole }}</span></td>
+                <td><span class="action-badge" [ngClass]="getActionBadgeClass(log.actionPerformed)">{{ log.actionPerformed }}</span></td>
+                <td class="resource-type">{{ log.targetResourceType }}</td>
+                <td class="resource-id">#{{ log.targetResourceId }}</td>
+                <td class="timestamp"><svg class="timestamp-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>{{ formatTimestamp(log.actionTimestamp) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Pagination -->
+        <div class="pagination">
+          <button class="pagination-btn" [disabled]="currentPage === 1" (click)="previousPage()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>Previous</button>
+          <div class="pagination-info"><span>Page {{ currentPage }} of {{ totalPages }}</span><span class="pagination-range">Showing {{ ((currentPage - 1) * itemsPerPage) + 1 }} - {{ Math.min(currentPage * itemsPerPage, filteredLogs.length) }} of {{ filteredLogs.length }}</span></div>
+          <button class="pagination-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">Next<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

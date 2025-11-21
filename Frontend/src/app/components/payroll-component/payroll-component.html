@@ -1,0 +1,551 @@
+<!-- Payroll Component -->
+<div class="payroll-container">
+  <!-- Header -->
+  <header class="payroll-header">
+    <div class="header-content">
+      <button class="back-btn" (click)="cancel()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Back
+      </button>
+      <h1>Salary Disbursal</h1>
+    </div>
+
+    <!-- Progress Steps -->
+    <div class="progress-steps">
+      <div class="step" [class.active]="currentStep >= 1" [class.completed]="currentStep > 1">
+        <div class="step-number">1</div>
+        <span class="step-label">Select People</span>
+      </div>
+      <div class="step-line" [class.completed]="currentStep > 1"></div>
+      <div class="step" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2">
+        <div class="step-number">2</div>
+        <span class="step-label">Review & Submit</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="loading-spinner"></div>
+    <p>Processing...</p>
+  </div>
+
+  <!-- Step 1: Selection -->
+  <div class="payroll-content" *ngIf="currentStep === 1">
+    <!-- Summary Card -->
+    <div class="summary-card">
+      <div class="summary-item">
+        <span class="summary-label">Selected</span>
+        <span class="summary-value">{{ selectedCount }}</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-item">
+        <span class="summary-label">Total Gross</span>
+        <span class="summary-value">₹{{ totalGross | number : '1.0-0' }}</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-item">
+        <span class="summary-label">Deductions</span>
+        <span class="summary-value deduction">-₹{{ totalDeductions | number : '1.0-0' }}</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-item highlight">
+        <span class="summary-label">Net Payable</span>
+        <span class="summary-value">₹{{ totalNet | number : '1.0-0' }}</span>
+      </div>
+    </div>
+
+    <!-- Period Selection -->
+    <div class="period-section">
+      <label for="period">Salary Period</label>
+      <input type="month" id="period" [(ngModel)]="period" class="period-input" required />
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+      <div class="search-box">
+        <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+          />
+        </svg>
+        <input
+          type="text"
+          placeholder="Search by name or email..."
+          [(ngModel)]="searchTerm"
+          class="search-input"
+        />
+      </div>
+
+      <select [(ngModel)]="selectedDepartment" class="department-filter">
+        <option *ngFor="let dept of departments" [value]="dept">{{ dept }}</option>
+      </select>
+    </div>
+
+    <!-- Employees Section -->
+    <section class="people-section">
+      <div class="section-header">
+        <h2>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+            />
+          </svg>
+          Employees
+          <span class="count-badge">{{ getFilteredEmployees().length }}</span>
+        </h2>
+        <button class="select-all-btn" (click)="selectAllEmployees()">
+          {{ areAllEmployeesSelected() ? 'Deselect All' : 'Select All' }}
+        </button>
+      </div>
+
+      <div class="people-grid" *ngIf="getFilteredEmployees().length > 0">
+        <div
+          class="person-card-compact"
+          *ngFor="let employee of getFilteredEmployees()"
+          [class.selected]="employee.selected"
+        >
+          <!-- Checkbox and Avatar -->
+          <div class="card-header-section">
+            <div class="checkbox-wrapper">
+              <input
+                type="checkbox"
+                [checked]="employee.selected"
+                (change)="toggleEmployee(employee)"
+                (click)="$event.stopPropagation()"
+              />
+            </div>
+
+            <div class="person-avatar">
+              {{ employee.empName.charAt(0).toUpperCase() }}
+            </div>
+
+            <div class="person-basic-info">
+              <h3 class="person-name">{{ employee.empName }}</h3>
+              <p class="person-email">{{ employee.empEmail }}</p>
+              <div class="person-meta">
+                <span class="meta-item" *ngIf="employee.departmentName">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="meta-icon">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                    />
+                  </svg>
+                  {{ employee.departmentName }}
+                </span>
+                <span class="meta-item grade-badge" *ngIf="employee.gradeCode">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="meta-icon">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                    />
+                  </svg>
+                  Grade {{ employee.gradeCode }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Expandable Details -->
+          <div class="card-actions" *ngIf="employee.salaryGrade">
+            <button
+              class="btn-link"
+              (click)="toggleEmployeeDetails(employee); $event.stopPropagation()"
+            >
+              <svg *ngIf="!employee.showDetails" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+              <svg *ngIf="employee.showDetails" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                />
+              </svg>
+              {{ employee.showDetails ? 'Hide Details' : 'View Details' }}
+            </button>
+
+            <span class="net-salary-badge" *ngIf="!employee.showDetails">
+              ₹{{ employee.netSalary | number : '1.0-0' }}
+            </span>
+          </div>
+
+          <!-- Salary Details (Expanded) -->
+          <div class="salary-details-expanded" *ngIf="employee.showDetails && employee.salaryGrade">
+            <div class="salary-breakdown">
+              <div class="breakdown-row">
+                <span class="label">Basic Salary</span>
+                <span class="value">₹{{ employee.salaryGrade.basicSalary | number : '1.0-0' }}</span>
+              </div>
+              <div class="breakdown-row">
+                <span class="label">HRA</span>
+                <span class="value">₹{{ employee.salaryGrade.hra | number : '1.0-0' }}</span>
+              </div>
+              <div class="breakdown-row">
+                <span class="label">DA</span>
+                <span class="value">₹{{ employee.salaryGrade.da | number : '1.0-0' }}</span>
+              </div>
+              <div class="breakdown-row">
+                <span class="label">Allowances</span>
+                <span class="value">₹{{ employee.salaryGrade.allowances | number : '1.0-0' }}</span>
+              </div>
+              <div class="breakdown-divider"></div>
+              <div class="breakdown-row gross">
+                <span class="label">Gross Salary</span>
+                <span class="value"
+                  >₹{{
+                    employee.salaryGrade.basicSalary +
+                      employee.salaryGrade.hra +
+                      employee.salaryGrade.da +
+                      employee.salaryGrade.allowances | number : '1.0-0'
+                  }}</span
+                >
+              </div>
+              <div class="breakdown-row deduction">
+                <span class="label">PF Deduction</span>
+                <span class="value">-₹{{ employee.salaryGrade.pf | number : '1.0-0' }}</span>
+              </div>
+              <div class="breakdown-divider"></div>
+              <div class="breakdown-row net">
+                <span class="label">Net Salary</span>
+                <span class="value">₹{{ employee.netSalary | number : '1.0-0' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="getFilteredEmployees().length === 0">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+          />
+        </svg>
+        <p>No employees found</p>
+      </div>
+    </section>
+
+    <!-- Org Admins Section -->
+    <section class="people-section" *ngIf="orgAdmins.length > 0">
+      <div class="section-header">
+        <h2>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          Organization Admins
+          <span class="count-badge">{{ orgAdmins.length }}</span>
+        </h2>
+        <button class="select-all-btn" (click)="selectAllAdmins()">
+          {{ areAllAdminsSelected() ? 'Deselect All' : 'Select All' }}
+        </button>
+      </div>
+
+      <div class="people-grid">
+        <div
+          class="person-card-compact"
+          *ngFor="let admin of orgAdmins"
+          [class.selected]="admin.selected"
+        >
+          <div class="card-header-section">
+            <div class="checkbox-wrapper">
+              <input
+                type="checkbox"
+                [checked]="admin.selected"
+                (change)="toggleOrgAdmin(admin)"
+                (click)="$event.stopPropagation()"
+              />
+            </div>
+
+            <div class="person-avatar admin-avatar">
+              {{ admin.name.charAt(0).toUpperCase() }}
+            </div>
+
+            <div class="person-basic-info">
+              <h3 class="person-name">{{ admin.name }}</h3>
+              <p class="person-email">{{ admin.email }}</p>
+              <div class="person-meta">
+                <span class="meta-item admin-badge">Admin</span>
+                <span class="meta-item grade-badge" *ngIf="admin.gradeCode">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="meta-icon">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                    />
+                  </svg>
+                  Grade  {{ admin.salaryGrade?.gradeCode }} 
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-actions" *ngIf="admin.salaryGrade">
+            <button
+              class="btn-link"
+              (click)="toggleAdminDetails(admin); $event.stopPropagation()"
+            >
+              <svg *ngIf="!admin.showDetails" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+              <svg *ngIf="admin.showDetails" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                />
+              </svg>
+              {{ admin.showDetails ? 'Hide Details' : 'View Details' }}
+            </button>
+
+            <span class="net-salary-badge" *ngIf="!admin.showDetails">
+              ₹{{ admin.netSalary | number : '1.0-0' }}
+            </span>
+          </div>
+
+          <div class="salary-details-expanded" *ngIf="admin.showDetails && admin.salaryGrade">
+            <div class="salary-breakdown">
+              <div class="breakdown-row">
+                <span class="label">Basic Salary</span>
+                <span class="value">₹{{ admin.salaryGrade.basicSalary | number : '1.0-0' }}</span>
+              </div>
+              <div class="breakdown-row">
+                <span class="label">HRA</span>
+                <span class="value">₹{{ admin.salaryGrade.hra | number : '1.0-0' }}</span>
+              </div>
+              <div class="breakdown-row">
+                <span class="label">DA</span>
+                <span class="value">₹{{ admin.salaryGrade.da | number : '1.0-0' }}</span>
+              </div>
+              <div class="breakdown-row">
+                <span class="label">Allowances</span>
+                <span class="value">₹{{ admin.salaryGrade.allowances | number : '1.0-0' }}</span>
+              </div>
+              <div class="breakdown-divider"></div>
+              <div class="breakdown-row gross">
+                <span class="label">Gross Salary</span>
+                <span class="value"
+                  >₹{{
+                    admin.salaryGrade.basicSalary +
+                      admin.salaryGrade.hra +
+                      admin.salaryGrade.da +
+                      admin.salaryGrade.allowances | number : '1.0-0'
+                  }}</span
+                >
+              </div>
+              <div class="breakdown-row deduction">
+                <span class="label">PF Deduction</span>
+                <span class="value">-₹{{ admin.salaryGrade.pf | number : '1.0-0' }}</span>
+              </div>
+              <div class="breakdown-divider"></div>
+              <div class="breakdown-row net">
+                <span class="label">Net Salary</span>
+                <span class="value">₹{{ admin.netSalary | number : '1.0-0' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+      <button
+        class="btn btn-primary btn-large"
+        (click)="goToPreview()"
+        [disabled]="selectedCount === 0"
+      >
+        Continue to Review
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Step 2: Preview & Confirm -->
+  <div class="payroll-content" *ngIf="currentStep === 2">
+    <div class="preview-section">
+      <h2>Review Salary Disbursal Request</h2>
+
+      <!-- Summary -->
+      <div class="preview-summary">
+        <div class="summary-row">
+          <span>Period:</span>
+          <strong>{{ period }}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Total People:</span>
+          <strong>{{ selectedCount }}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Total Gross Salary:</span>
+          <strong>₹{{ totalGross | number : '1.0-0' }}</strong>
+        </div>
+        <div class="summary-row deduction">
+          <span>Total Deductions (PF):</span>
+          <strong>-₹{{ totalDeductions | number : '1.0-0' }}</strong>
+        </div>
+        <div class="summary-row highlight">
+          <span>Net Payable Amount:</span>
+          <strong>₹{{ totalNet | number : '1.0-0' }}</strong>
+        </div>
+      </div>
+
+      <!-- Remarks -->
+      <div class="remarks-section">
+        <label for="remarks">Remarks (Optional)</label>
+        <textarea
+          id="remarks"
+          [(ngModel)]="remarks"
+          placeholder="Add any remarks or notes..."
+          rows="3"
+          class="remarks-input"
+        >
+        </textarea>
+      </div>
+
+      <!-- Selected People Details -->
+      <div class="selected-people-details">
+        <h3>Selected Employees ({{ getSelectedEmployees().length }})</h3>
+        <div class="details-table-wrapper">
+          <table class="details-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th class="text-right">Gross</th>
+                <th class="text-right">Deductions</th>
+                <th class="text-right">Net Salary</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let emp of getSelectedEmployees()">
+                <td>{{ emp.empName }}</td>
+                <td>{{ emp.empEmail }}</td>
+                <td>{{ emp.departmentName || 'N/A' }}</td>
+                <td class="text-right">
+                  ₹{{
+                    emp.salaryGrade!.basicSalary +
+                      emp.salaryGrade!.hra +
+                      emp.salaryGrade!.da +
+                      emp.salaryGrade!.allowances | number : '1.0-0'
+                  }}
+                </td>
+                <td class="text-right">₹{{ emp.salaryGrade!.pf | number : '1.0-0' }}</td>
+                <td class="text-right strong">₹{{ emp.netSalary | number : '1.0-0' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 *ngIf="getSelectedAdmins().length > 0" style="margin-top: 2rem">
+          Selected Admins ({{ getSelectedAdmins().length }})
+        </h3>
+        <div class="details-table-wrapper" *ngIf="getSelectedAdmins().length > 0">
+          <table class="details-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th class="text-right">Gross</th>
+                <th class="text-right">Deductions</th>
+                <th class="text-right">Net Salary</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let admin of getSelectedAdmins()">
+                <td>{{ admin.name }}</td>
+                <td>{{ admin.email }}</td>
+                <td><span class="admin-badge-small">Admin</span></td>
+                <td class="text-right">
+                  ₹{{
+                    admin.salaryGrade!.basicSalary +
+                      admin.salaryGrade!.hra +
+                      admin.salaryGrade!.da +
+                      admin.salaryGrade!.allowances | number : '1.0-0'
+                  }}
+                </td>
+                <td class="text-right">₹{{ admin.salaryGrade!.pf | number : '1.0-0' }}</td>
+                <td class="text-right strong">₹{{ admin.netSalary | number : '1.0-0' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="btn btn-secondary" (click)="backToSelection()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+        Back to Selection
+      </button>
+      <button class="btn btn-primary btn-large" (click)="submitRequest()">
+        Submit to Bank Admin
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,62 @@
+<!-- Consistent Header -->
+<header class="navbar">
+  <div class="nav-container">
+    <a routerLink="/" class="logo">Pay<span class="logo-accent">Roll</span></a>
+    
+    <nav class="nav-links">
+      <a routerLink="/about" routerLinkActive="active-link" class="nav-link">About Us</a>
+      <a routerLink="/contact" routerLinkActive="active-link" class="nav-link">Contact Us</a>
+      <a routerLink="/login" class="nav-link" style="flex-shrink: 0;">Login</a>
+      <a routerLink="/register" class="nav-link nav-link-register">Register as Org</a>
+      
+      <!-- Theme Toggle Button -->
+      <button (click)="toggleTheme()" class="theme-toggle" aria-label="Toggle theme">
+        <svg *ngIf="!isDarkMode" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" /></svg>
+        <svg *ngIf="isDarkMode" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.95-4.243l-1.59-1.591M3.75 12H6m4.243-4.95l1.59-1.591M12 6.75A5.25 5.25 0 006.75 12a5.25 5.25 0 005.25 5.25a5.25 5.25 0 005.25-5.25A5.25 5.25 0 0012 6.75z" /></svg>
+      </button>
+    </nav>
+    
+    <!-- Mobile Menu Button (Add logic in your TS file if needed) -->
+    <button class="mobile-menu-button">
+      <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+    </button>
+  </div>
+</header>
+
+<!-- Main Content for About Us Page -->
+<main class="about-us-wrapper">
+  <div class="container content-section">
+    <h1>Our Mission</h1>
+    <p class="subtitle">
+      To simplify and automate payroll and payment management for organizations of all sizes, ensuring accuracy, security, and peace of mind.
+    </p>
+
+    <div class="mission-image">
+      <img src="https://placehold.co/800x400/667eea/white?text=Our+Team" alt="Our Team working together">
+    </div>
+
+    <h2>Who We Are</h2>
+    <p>
+      PayRoll was born from a simple idea: managing salaries and vendor payments shouldn't be a complex, time-consuming chore. We are a team of passionate developers, financial experts, and designers dedicated to building a platform that is both powerful and incredibly easy to use. Our system is designed to bridge the gap between organizations and banks, creating a seamless, transparent, and efficient workflow.
+    </p>
+    <p>
+      Built for our Capstone project, this platform leverages modern technologies like Angular and Spring Boot to deliver a secure, reliable, and scalable solution. We believe in the power of technology to solve real-world problems, and payroll management is a challenge we are proud to tackle.
+    </p>
+
+    <div class="values-section">
+      <div class="value-card">
+        <h3>Security First</h3>
+        <p>Your financial data is your most critical asset. We use industry-standard encryption and security protocols to keep it safe.</p>
+      </div>
+      <div class="value-card">
+        <h3>Simplicity</h3>
+        <p>We design our interfaces to be intuitive and straightforward, reducing the learning curve for you and your team.</p>
+      </div>
+      <div class="value-card">
+        <h3>Reliability</h3>
+        <p>Count on our platform to be available when you need it most, ensuring your payments are processed on time, every time.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
